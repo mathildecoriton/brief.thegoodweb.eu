@@ -259,6 +259,7 @@ let dateFrom = '';
 let dateTo = '';
 let fd = {};
 let briefs = [];
+let nouveauxCount = 0;
 let detailBrief = null;
 
 const $ = id => document.getElementById(id);
@@ -400,7 +401,7 @@ function renderApp() {
       </a>
       <div class="topbar-nav">
         ${!isRegie ? `<button class="nav-btn ${view==='client'?'active':''}" onclick="go('client')">Mes briefs</button>` : ''}
-        ${isRegie ? `<button class="nav-btn ${view==='agency'?'active':''}" onclick="go('agency')">Tableau de bord</button>` : ''}
+        ${isRegie ? `<button class="nav-btn ${view==='agency'?'active':''}" onclick="go('agency')">Tableau de bord${nouveauxCount>0?` <span style="display:inline-flex;align-items:center;justify-content:center;background:var(--orange);color:#fff;font-size:10px;font-weight:600;width:17px;height:17px;border-radius:50%;margin-left:4px;vertical-align:middle">${nouveauxCount}</span>`:''}</button>` : ''}
         ${!isRegie ? `<button class="nav-btn cta ${view==='form'?'active':''}" onclick="go('form')">+ Déposer un brief</button>` : ''}
         <span class="nav-user">${session?.user?.email}</span>
         <button class="nav-logout" onclick="doLogout()">Déconnexion</button>
@@ -604,6 +605,7 @@ async function submitBrief() {
     infos_complementaires: fd.infos || '',
     statut: 'nouveau',
     lien_plan_media: '',
+    notes_internes: '',
     created_at: new Date().toISOString(),
   }]);
   if (error) { console.error(error); if (btn) { btn.disabled = false; btn.textContent = 'Envoyer le brief'; } return; }
@@ -653,6 +655,7 @@ async function renderAgency() {
   $('main').innerHTML = `<div class="loading">Chargement…</div>`;
   const { data } = await sb.from('briefs').select('*').order('created_at', { ascending: false });
   briefs = data || [];
+  nouveauxCount = briefs.filter(b=>b.statut==='nouveau').length;
 
   const filtered = briefs.filter(b => {
     const matchCom = agFilter === 'all' || b.commercial === agFilter;
@@ -794,6 +797,14 @@ function renderDetail() {
     </div>
     ${b.kpis?`<div class="card"><div class="card-label">KPIs</div><div style="font-size:13.5px;color:var(--gray-800);line-height:1.6">${b.kpis}</div></div>`:''}
     ${b.infos_complementaires?`<div class="card"><div class="card-label">Informations complémentaires</div><div style="font-size:13.5px;color:var(--gray-800);line-height:1.6">${b.infos_complementaires}</div></div>`:''}
+    ${isRegie ? `
+    <div class="card" style="border:1px solid var(--gray-200);background:var(--gray-50)">
+      <div class="card-label">Notes internes <span style="font-size:10px;font-weight:400;opacity:.5">(régie uniquement)</span></div>
+      <textarea id="notes-input" placeholder="Commentaires internes, échanges entre commerciaux, points de vigilance…" style="width:100%;font-size:13.5px;border:1px solid var(--gray-200);border-radius:9px;padding:10px 12px;background:#fff;color:var(--gray-800);outline:none;font-family:var(--font);resize:vertical;min-height:100px;line-height:1.5">${b.notes_internes||''}</textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px">
+        <button onclick="saveNotes('${b.id}')" style="background:var(--gray-800);border:none;border-radius:9px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;color:#fff;font-family:var(--font)">Enregistrer</button>
+      </div>
+    </div>` : ''}
     <div class="card" style="border:1px solid var(--sky-mid);background:var(--sky-light)">
       <div class="card-label" style="color:var(--navy)">Plan média</div>
       ${isRegie ? `
@@ -804,6 +815,18 @@ function renderDetail() {
       </div>` : ''}
       ${b.lien_plan_media ? `<a href="${b.lien_plan_media}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--navy);font-weight:500;text-decoration:none;background:#fff;border:1px solid var(--sky);border-radius:8px;padding:8px 14px">&#8599; Ouvrir le plan média</a>` : `<div style="font-size:13px;color:var(--gray-400)">${isRegie ? 'Aucun lien renseigné pour l’instant.' : 'Plan média en cours de préparation.'}</div>`}
     </div>`;
+}
+
+async function saveNotes(id) {
+  const input = document.getElementById('notes-input');
+  if (!input) return;
+  const notes = input.value;
+  await sb.from('briefs').update({ notes_internes: notes }).eq('id', id);
+  if (detailBrief && detailBrief.id === id) detailBrief.notes_internes = notes;
+  const b = briefs.find(b=>b.id===id);
+  if (b) b.notes_internes = notes;
+  input.style.borderColor = 'var(--green)';
+  setTimeout(() => { input.style.borderColor = 'var(--gray-200)'; }, 2000);
 }
 
 async function savePlanMedia(id) {
