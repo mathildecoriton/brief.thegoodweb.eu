@@ -5,169 +5,150 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>brief.thegoodweb.eu</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --navy:#001858;
-  --navy-deep:#001040;
-  --sky:#79BEFF;
-  --sky-light:#E8F4FF;
-  --sky-mid:#B3DBFF;
-  --orange:#F3562D;
-  --white:#ffffff;
-  --gray-50:#f9fafb;
-  --gray-100:#f3f4f6;
-  --gray-200:#e5e7eb;
-  --gray-400:#9ca3af;
-  --gray-600:#4b5563;
-  --gray-800:#1f2937;
-  --green:#16a34a;
-  --green-light:#dcfce7;
-  --amber:#d97706;
-  --amber-light:#fef3c7;
-  --font:'DM Sans',sans-serif;
-  --mono:'DM Mono',monospace;
+  --navy:#001858;--sky:#79BEFF;--sky-light:#E8F4FF;--sky-mid:#B3DBFF;--orange:#F3562D;
+  --white:#fff;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-400:#9ca3af;--gray-600:#4b5563;--gray-800:#1f2937;
+  --green:#16a34a;--green-light:#dcfce7;--amber:#d97706;--amber-light:#fef3c7;
+  --red:#dc2626;--red-light:#fee2e2;--purple:#7c3aed;--purple-light:#ede9fe;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
 }
 html,body{height:100%;font-family:var(--font);background:var(--gray-50);color:var(--gray-800)}
 .app{display:flex;flex-direction:column;min-height:100vh}
 
 /* TOPBAR */
-.topbar{background:var(--navy);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 0 rgba(255,255,255,.06)}
-.logo{display:flex;flex-direction:column;line-height:1.1;gap:1px}
+.topbar{background:var(--navy);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;flex-direction:column;line-height:1.1;gap:1px;text-decoration:none}
 .logo-main{font-size:14px;font-weight:600;color:#fff;letter-spacing:.05em}
-.logo-sub{font-size:8.5px;color:var(--sky);letter-spacing:.12em;font-weight:400}
+.logo-sub{font-size:8.5px;color:var(--sky);letter-spacing:.12em}
 .topbar-nav{display:flex;align-items:center;gap:4px}
-.nav-btn{padding:6px 16px;border-radius:100px;font-size:12.5px;font-weight:400;cursor:pointer;color:rgba(255,255,255,.65);border:none;background:none;font-family:var(--font);transition:all .15s;letter-spacing:.01em}
+.nav-btn{padding:6px 16px;border-radius:100px;font-size:12.5px;cursor:pointer;color:rgba(255,255,255,.65);border:none;background:none;font-family:var(--font);transition:all .15s}
 .nav-btn:hover{color:#fff}
 .nav-btn.active{background:rgba(255,255,255,.1);color:#fff}
 .nav-btn.cta{border:1px solid rgba(121,190,255,.5);color:#fff;opacity:.9;margin-left:4px}
 .nav-btn.cta:hover{border-color:var(--sky);background:rgba(121,190,255,.08);opacity:1}
-.nav-btn.cta.active{background:rgba(121,190,255,.12);border-color:var(--sky);color:#fff}
+.nav-btn.cta.active{background:rgba(121,190,255,.12);border-color:var(--sky)}
+.nav-user{font-size:12px;color:rgba(255,255,255,.5);margin-right:8px}
+.nav-logout{font-size:12px;color:rgba(255,255,255,.4);cursor:pointer;border:none;background:none;font-family:var(--font);padding:4px 8px;border-radius:6px;transition:all .15s}
+.nav-logout:hover{color:#fff;background:rgba(255,255,255,.08)}
 
 /* MAIN */
-.main{flex:1;padding:32px 24px;max-width:640px;margin:0 auto;width:100%}
+.main{flex:1;padding:32px 24px;max-width:680px;margin:0 auto;width:100%}
+.main.wide{max-width:900px}
 
-/* HEADINGS */
-.page-title{font-size:22px;font-weight:500;color:var(--navy);margin-bottom:4px}
-.page-sub{font-size:13.5px;color:var(--gray-400);margin-bottom:24px}
+/* AUTH PAGE */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--navy);padding:24px}
+.auth-card{background:#fff;border-radius:16px;padding:40px 36px;width:100%;max-width:400px}
+.auth-logo{display:flex;flex-direction:column;align-items:center;margin-bottom:28px;gap:2px}
+.auth-logo-main{font-size:20px;font-weight:700;color:var(--navy);letter-spacing:.05em}
+.auth-logo-sub{font-size:10px;color:var(--sky);letter-spacing:.12em}
+.auth-title{font-size:18px;font-weight:500;color:var(--navy);margin-bottom:6px;text-align:center}
+.auth-sub{font-size:13px;color:var(--gray-400);text-align:center;margin-bottom:24px}
+.auth-tabs{display:flex;gap:0;margin-bottom:24px;border:1px solid var(--gray-200);border-radius:9px;overflow:hidden}
+.auth-tab{flex:1;padding:9px;font-size:13px;font-weight:500;cursor:pointer;background:#fff;color:var(--gray-400);border:none;font-family:var(--font);transition:all .15s;text-align:center}
+.auth-tab.on{background:var(--navy);color:#fff}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12.5px;color:var(--gray-600);margin-bottom:5px;font-weight:500}
+.field input,.field select{width:100%;font-size:14px;border:1px solid var(--gray-200);border-radius:9px;padding:10px 12px;background:#fff;color:var(--gray-800);outline:none;transition:border .15s,box-shadow .15s;font-family:var(--font)}
+.field input:focus,.field select:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(121,190,255,.15)}
+.field textarea{width:100%;font-size:14px;border:1px solid var(--gray-200);border-radius:9px;padding:10px 12px;background:#fff;color:var(--gray-800);outline:none;transition:border .15s;font-family:var(--font);resize:vertical;min-height:72px;line-height:1.5}
+.field textarea:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(121,190,255,.15)}
+.btn-primary{width:100%;background:var(--navy);border:none;border-radius:9px;padding:11px;font-size:14px;font-weight:500;cursor:pointer;color:#fff;font-family:var(--font);transition:opacity .15s;margin-top:4px}
+.btn-primary:hover{opacity:.85}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-google{width:100%;background:#fff;border:1px solid var(--gray-200);border-radius:9px;padding:11px;font-size:14px;font-weight:400;cursor:pointer;color:var(--gray-700);font-family:var(--font);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+.btn-google:hover{border-color:var(--gray-400);background:var(--gray-50)}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--gray-400);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.auth-error{background:var(--red-light);color:var(--red);font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:14px;display:none}
+.auth-error.show{display:block}
 
 /* CARDS */
 .card{background:#fff;border:1px solid var(--gray-200);border-radius:14px;padding:20px;margin-bottom:12px}
 .card-label{font-size:10.5px;font-weight:500;color:var(--sky);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
 .card-label::before{content:'';width:3px;height:12px;background:var(--sky);border-radius:2px;display:inline-block}
 
-/* FORM FIELDS */
-.field{margin-bottom:14px}
-.field:last-child{margin-bottom:0}
-.field label{display:block;font-size:12.5px;color:var(--gray-600);margin-bottom:5px;font-weight:500}
-.field input,.field select,.field textarea{
-  width:100%;font-size:14px;border:1px solid var(--gray-200);border-radius:9px;
-  padding:9px 12px;background:#fff;color:var(--gray-800);outline:none;
-  transition:border .15s,box-shadow .15s;font-family:var(--font)
-}
-.field input:focus,.field select:focus,.field textarea:focus{
-  border-color:var(--sky);box-shadow:0 0 0 3px rgba(121,190,255,.15)
-}
-.field textarea{resize:vertical;min-height:72px;line-height:1.5}
+/* FORM */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-/* CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
-.chip{
-  display:inline-flex;align-items:center;gap:5px;padding:6px 13px;
-  border:1px solid var(--gray-200);border-radius:100px;font-size:13px;
-  cursor:pointer;color:var(--gray-600);background:#fff;
-  transition:all .15s;user-select:none;font-family:var(--font)
-}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border:1px solid var(--gray-200);border-radius:100px;font-size:13px;cursor:pointer;color:var(--gray-600);background:#fff;transition:all .15s;user-select:none;font-family:var(--font)}
 .chip:hover{border-color:var(--sky-mid)}
 .chip.on{border-color:var(--sky);color:var(--navy);background:var(--sky-light);font-weight:500}
-
-/* TOGGLE */
 .toggle-row{display:flex;gap:8px;margin-top:6px}
-.tog{
-  flex:1;padding:9px;border:1px solid var(--gray-200);border-radius:9px;
-  font-size:13.5px;cursor:pointer;background:#fff;color:var(--gray-600);
-  transition:all .15s;text-align:center;font-family:var(--font)
-}
-.tog:hover{border-color:var(--sky-mid)}
+.tog{flex:1;padding:9px;border:1px solid var(--gray-200);border-radius:9px;font-size:13.5px;cursor:pointer;background:#fff;color:var(--gray-600);transition:all .15s;text-align:center;font-family:var(--font)}
 .tog.on{border-color:var(--sky);background:var(--sky-light);color:var(--navy);font-weight:500}
-
-/* COMMERCIAL CARDS */
-.com-card{
-  display:flex;align-items:center;gap:12px;padding:12px 14px;
-  border:1px solid var(--gray-200);border-radius:11px;cursor:pointer;
-  transition:all .15s;margin-bottom:8px
-}
-.com-card:last-child{margin-bottom:0}
-.com-card:hover{border-color:var(--sky-mid)}
-.com-card.on{border-color:var(--sky);background:var(--sky-light)}
-.com-avatar{
-  width:38px;height:38px;border-radius:50%;background:var(--sky-light);
-  display:flex;align-items:center;justify-content:center;font-size:12px;
-  font-weight:600;color:var(--navy);flex-shrink:0;border:1px solid var(--gray-200);
-  font-family:var(--mono)
-}
-.com-card.on .com-avatar{background:#fff;border-color:var(--sky)}
-.com-name{font-size:14px;color:var(--gray-800);font-weight:500}
-.com-role{font-size:11.5px;color:var(--gray-400);margin-top:1px}
-.com-check{margin-left:auto;color:var(--sky);font-size:18px}
 
 /* PROGRESS */
 .step-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
 .step-info .step-title{font-size:21px;font-weight:500;color:var(--navy)}
 .step-info .step-meta{font-size:12.5px;color:var(--gray-400);margin-top:2px}
-.progress{display:flex;gap:5px;align-items:center}
-.pdot{height:3px;width:30px;border-radius:3px;background:var(--gray-200);transition:background .3s}
+.progress{display:flex;gap:5px}
+.pdot{height:3px;width:28px;border-radius:3px;background:var(--gray-200);transition:background .3s}
 .pdot.done{background:var(--sky)}
 .pdot.cur{background:rgba(121,190,255,.45)}
 
 /* BUTTONS */
 .btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
-.btn-back{background:none;border:1px solid var(--gray-200);border-radius:9px;padding:9px 20px;font-size:13.5px;cursor:pointer;color:var(--gray-600);font-family:var(--font);transition:all .15s}
-.btn-back:hover{border-color:var(--gray-400)}
-.btn-next{background:var(--navy);border:none;border-radius:9px;padding:10px 24px;font-size:13.5px;font-weight:500;cursor:pointer;color:#fff;font-family:var(--font);transition:opacity .15s;display:flex;align-items:center;gap:6px}
+.btn-back{background:none;border:1px solid var(--gray-200);border-radius:9px;padding:9px 20px;font-size:13.5px;cursor:pointer;color:var(--gray-600);font-family:var(--font)}
+.btn-next{background:var(--navy);border:none;border-radius:9px;padding:10px 24px;font-size:13.5px;font-weight:500;cursor:pointer;color:#fff;font-family:var(--font);transition:opacity .15s}
 .btn-next:hover{opacity:.85}
-.btn-outline-sky{background:var(--sky-light);border:1px solid var(--sky);border-radius:9px;padding:10px 24px;font-size:13.5px;font-weight:500;cursor:pointer;color:var(--navy);font-family:var(--font)}
+.btn-next:disabled{opacity:.5;cursor:not-allowed}
+.btn-sky{background:var(--sky-light);border:1px solid var(--sky);border-radius:9px;padding:10px 24px;font-size:13.5px;font-weight:500;cursor:pointer;color:var(--navy);font-family:var(--font)}
 
 /* URL */
 .url-add{display:flex;gap:8px;margin-top:8px}
 .url-add input{flex:1;font-size:13.5px;border:1px solid var(--gray-200);border-radius:9px;padding:8px 12px;background:#fff;color:var(--gray-800);outline:none;font-family:var(--font)}
 .url-add input:focus{border-color:var(--sky)}
-.url-add button{padding:0 14px;border:1px solid var(--gray-200);border-radius:9px;background:var(--gray-50);font-size:13px;cursor:pointer;color:var(--gray-600);font-family:var(--font);white-space:nowrap}
+.url-add button{padding:0 14px;border:1px solid var(--gray-200);border-radius:9px;background:var(--gray-50);font-size:13px;cursor:pointer;color:var(--gray-600);font-family:var(--font)}
 .url-tag{display:inline-flex;align-items:center;gap:5px;background:var(--sky-light);border:1px solid var(--sky-mid);border-radius:100px;padding:3px 10px;font-size:12px;color:var(--navy);margin:4px 4px 0 0}
 .url-tag button{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:14px;line-height:1;padding:0}
 
-/* CONFIRMATION */
+/* COMMERCIAL */
+.com-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--gray-200);border-radius:11px;cursor:pointer;transition:all .15s;margin-bottom:8px}
+.com-card:hover{border-color:var(--sky-mid)}
+.com-card.on{border-color:var(--sky);background:var(--sky-light)}
+.com-avatar{width:38px;height:38px;border-radius:50%;background:var(--sky-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--navy);flex-shrink:0;border:1px solid var(--gray-200);font-family:var(--mono)}
+.com-card.on .com-avatar{background:#fff;border-color:var(--sky)}
+
+/* CONFIRM */
 .confirm-wrap{max-width:440px;margin:40px auto}
 .confirm-card{background:#fff;border:1px solid var(--gray-200);border-radius:16px;padding:40px 28px;text-align:center}
-.confirm-ring{width:56px;height:56px;border-radius:50%;background:var(--sky-light);border:2px solid var(--sky);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--navy);font-size:22px}
-.confirm-title{font-size:20px;font-weight:500;color:var(--navy);margin-bottom:8px}
-.confirm-text{font-size:13.5px;color:var(--gray-600);line-height:1.6;margin-bottom:20px}
+.confirm-ring{width:56px;height:56px;border-radius:50%;background:var(--sky-light);border:2px solid var(--sky);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--navy);font-size:24px}
 .confirm-sig{font-size:11px;font-weight:600;color:var(--navy);letter-spacing:.1em;margin-top:20px;opacity:.35;text-transform:uppercase}
 
 /* STATS */
-.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
 .stat{background:#fff;border:1px solid var(--gray-200);border-radius:12px;padding:16px;text-align:center}
-.stat-n{font-size:28px;font-weight:500;color:var(--navy);font-family:var(--mono)}
+.stat-n{font-size:26px;font-weight:500;font-family:var(--mono)}
 .stat-l{font-size:11px;color:var(--gray-400);margin-top:3px}
 
 /* BRIEF ROWS */
-.brief-row{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--gray-100)}
+.brief-row{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s}
 .brief-row:last-child{border-bottom:none}
+.brief-row:hover{background:var(--gray-50);margin:0 -8px;padding:11px 8px;border-radius:8px}
 .b-avatar{width:36px;height:36px;border-radius:50%;background:var(--sky-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--navy);flex-shrink:0;font-family:var(--mono)}
 .b-info{flex:1;min-width:0}
 .b-name{font-size:13.5px;font-weight:500;color:var(--gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .b-meta{font-size:11.5px;color:var(--gray-400);margin-top:2px}
-.badge{display:inline-block;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:500;white-space:nowrap}
-.badge-new{background:var(--sky-light);color:var(--navy)}
-.badge-prog{background:var(--amber-light);color:var(--amber)}
-.badge-done{background:var(--green-light);color:var(--green)}
 
-/* FILTER */
+/* BADGES / STATUTS */
+.badge{display:inline-block;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:500;white-space:nowrap}
+.badge-nouveau{background:var(--sky-light);color:var(--navy)}
+.badge-traitement{background:var(--amber-light);color:var(--amber)}
+.badge-attente{background:var(--purple-light);color:var(--purple)}
+.badge-gagne{background:var(--green-light);color:var(--green)}
+.badge-perdu{background:var(--red-light);color:var(--red)}
+
+/* STATUS SELECT */
+.status-select{font-size:12px;border:1px solid var(--gray-200);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:var(--font);background:#fff;outline:none}
+
+/* FILTERS */
 .filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .filter-btn{padding:5px 13px;border-radius:100px;font-size:12px;border:1px solid var(--gray-200);background:#fff;color:var(--gray-600);cursor:pointer;font-family:var(--font);transition:all .15s}
-.filter-btn:hover{border-color:var(--sky-mid)}
 .filter-btn.on{border-color:var(--sky);background:var(--sky-light);color:var(--navy);font-weight:500}
 
 /* TIMELINE */
@@ -184,80 +165,216 @@ html,body{height:100%;font-family:var(--font);background:var(--gray-50);color:va
 .bar-track{flex:1;height:5px;border-radius:3px;background:var(--gray-100);overflow:hidden}
 .bar-fill{height:100%;border-radius:3px;background:var(--sky)}
 
-/* DIVIDER */
-.section-note{font-size:12px;color:var(--gray-400);margin:10px 0 16px;padding:10px 12px;background:var(--gray-50);border-radius:8px;border-left:3px solid var(--sky)}
+/* PAGE */
+.page-title{font-size:22px;font-weight:500;color:var(--navy);margin-bottom:4px}
+.page-sub{font-size:13.5px;color:var(--gray-400);margin-bottom:24px}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;min-height:200px;color:var(--gray-400);font-size:14px}
+
+/* DETAIL */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.detail-item{background:var(--gray-50);border-radius:9px;padding:12px}
+.detail-label{font-size:11px;color:var(--gray-400);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.detail-value{font-size:13.5px;color:var(--gray-800)}
+.btn-back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--gray-400);cursor:pointer;border:none;background:none;font-family:var(--font);padding:0;margin-bottom:20px}
+.btn-back-link:hover{color:var(--navy)}
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
 
 <script>
-const $=id=>document.getElementById(id);
-let view='form',step=0,agFilter='all';
-const fd={};
+const SUPABASE_URL = 'https://druqaaomblhpsgqqxvzi.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Fq3gV3Tu6wEdeVNrFf98XA_wTsz2QCS';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const commerciaux=[
+const commerciaux = [
   {id:'jerome',name:'Jérôme',role:'Directeur commercial',init:'JR'},
   {id:'mathilde',name:'Mathilde',role:'Chargée de clientèle',init:'MT'},
   {id:'leslie',name:'Leslie',role:'Chargée de clientèle',init:'LS'},
 ];
 
-const allBriefs=[
-  {id:1,init:'LC',name:'Leclerc Drive',camp:'Rentrée 2025',obj:'Acquisition',date:'28 mai',status:'new',commercial:'jerome',client:'leclerc'},
-  {id:2,init:'OR',name:'Orange Pro',camp:'Offre B2B automne',obj:'Notoriété',date:'26 mai',status:'prog',commercial:'mathilde',client:'orange'},
-  {id:3,init:'BN',name:'BNP Paribas',camp:'Moments de vie',obj:'Fidélisation',date:'22 mai',status:'done',commercial:'leslie',client:'bnp'},
-  {id:4,init:'SG',name:'Société Générale',camp:'Lancement carte',obj:'Lancement',date:'18 mai',status:'done',commercial:'jerome',client:'sg'},
+const STATUTS = [
+  {id:'nouveau',label:'Nouveau',badge:'badge-nouveau'},
+  {id:'traitement',label:'En traitement',badge:'badge-traitement'},
+  {id:'attente',label:'En attente client',badge:'badge-attente'},
+  {id:'gagne',label:'Gagné',badge:'badge-gagne'},
+  {id:'perdu',label:'Perdu',badge:'badge-perdu'},
 ];
 
-const clientBriefs=allBriefs.filter(b=>b.client==='leclerc');
-const steps=['Infos client','Objectif','Ciblages','Formats','URL','Contact'];
+const formSteps = ['Infos client','Objectif','Ciblages','Formats','URL','Contact'];
 
-function render(){
-  $('app').innerHTML=`
+let session = null;
+let userRole = null; // 'regie' | 'client'
+let view = 'form';
+let formStep = 0;
+let agFilter = 'all';
+let statFilter = 'all';
+let fd = {};
+let briefs = [];
+let detailBrief = null;
+
+const $ = id => document.getElementById(id);
+
+// ─── INIT ───
+async function init() {
+  const { data } = await sb.auth.getSession();
+  session = data.session;
+  if (session) {
+    await detectRole();
+    renderApp();
+  } else {
+    renderAuth();
+  }
+  sb.auth.onAuthStateChange(async (event, s) => {
+    session = s;
+    if (s) { await detectRole(); renderApp(); }
+    else { userRole = null; renderAuth(); }
+  });
+}
+
+async function detectRole() {
+  // Check profiles table for role
+  const { data } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+  userRole = data?.role || 'client';
+  if (userRole === 'regie') view = 'agency';
+  else view = 'client';
+}
+
+// ─── AUTH ───
+let authMode = 'login';
+function renderAuth() {
+  $('app').innerHTML = `
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <span class="auth-logo-main">THE GOOD WEB</span>
+          <span class="auth-logo-sub">· THE GOOD AUDIENCE</span>
+        </div>
+        <div id="auth-error" class="auth-error"></div>
+        ${userRole === null && authMode === 'login' ? `
+          <div class="auth-tabs">
+            <button class="auth-tab ${authMode==='login'?'on':''}" onclick="authMode='login';renderAuth()">Connexion</button>
+            <button class="auth-tab ${authMode==='signup'?'on':''}" onclick="authMode='signup';renderAuth()">Créer un compte</button>
+          </div>
+        ` : ''}
+        ${authMode === 'login' ? renderLoginForm() : renderSignupForm()}
+      </div>
+    </div>`;
+}
+
+function renderLoginForm() {
+  return `
+    <div class="auth-title">Bienvenue</div>
+    <div class="auth-sub">Connectez-vous à votre espace</div>
+    <div class="field"><label>Email</label><input id="auth-email" type="email" placeholder="votre@email.com"></div>
+    <div class="field"><label>Mot de passe</label><input id="auth-pwd" type="password" placeholder="••••••••"></div>
+    <button class="btn-primary" onclick="doLogin()">Se connecter</button>
+    <div class="divider">ou</div>
+    <button class="btn-google" onclick="doGoogle()">
+      <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continuer avec Google
+    </button>`;
+}
+
+function renderSignupForm() {
+  return `
+    <div class="auth-title">Créer un compte</div>
+    <div class="auth-sub">Accès client The Good Web</div>
+    <div class="field"><label>Nom de l'entreprise</label><input id="auth-company" type="text" placeholder="Votre entreprise"></div>
+    <div class="field"><label>Email</label><input id="auth-email" type="email" placeholder="votre@email.com"></div>
+    <div class="field"><label>Mot de passe</label><input id="auth-pwd" type="password" placeholder="8 caractères minimum"></div>
+    <button class="btn-primary" onclick="doSignup()">Créer mon compte</button>
+    <div style="text-align:center;margin-top:14px"><button style="background:none;border:none;font-size:12px;color:var(--gray-400);cursor:pointer;font-family:var(--font)" onclick="authMode='login';renderAuth()">Déjà un compte ? Se connecter</button></div>`;
+}
+
+async function doLogin() {
+  const email = $('auth-email')?.value;
+  const pwd = $('auth-pwd')?.value;
+  if (!email || !pwd) return showAuthError('Veuillez remplir tous les champs.');
+  const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  if (error) showAuthError('Email ou mot de passe incorrect.');
+}
+
+async function doSignup() {
+  const email = $('auth-email')?.value;
+  const pwd = $('auth-pwd')?.value;
+  const company = $('auth-company')?.value;
+  if (!email || !pwd || !company) return showAuthError('Veuillez remplir tous les champs.');
+  const { error } = await sb.auth.signUp({ email, password: pwd, options: { data: { company } } });
+  if (error) showAuthError(error.message);
+  else showAuthError('Compte créé ! Vérifiez votre email pour confirmer.', 'green');
+}
+
+async function doGoogle() {
+  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+}
+
+function showAuthError(msg, type='red') {
+  const el = $('auth-error');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'green' ? 'var(--green-light)' : 'var(--red-light)';
+  el.style.color = type === 'green' ? 'var(--green)' : 'var(--red)';
+}
+
+// ─── APP ───
+function renderApp() {
+  const isRegie = userRole === 'regie';
+  $('app').innerHTML = `
     <div class="topbar">
-      <div class="logo">
+      <a class="logo" href="#" onclick="go(isRegie?'agency':'client');return false">
         <span class="logo-main">THE GOOD WEB</span>
         <span class="logo-sub">· THE GOOD AUDIENCE</span>
-      </div>
+      </a>
       <div class="topbar-nav">
-        <button class="nav-btn ${view==='client'?'active':''}" onclick="go('client')">Mon espace</button>
-        <button class="nav-btn ${view==='agency'?'active':''}" onclick="go('agency')">Tableau de bord</button>
+        ${!isRegie ? `<button class="nav-btn ${view==='client'?'active':''}" onclick="go('client')">Mes briefs</button>` : ''}
+        ${isRegie ? `<button class="nav-btn ${view==='agency'?'active':''}" onclick="go('agency')">Tableau de bord</button>` : ''}
         <button class="nav-btn cta ${view==='form'?'active':''}" onclick="go('form')">+ Déposer un brief</button>
+        <span class="nav-user">${session?.user?.email}</span>
+        <button class="nav-logout" onclick="doLogout()">Déconnexion</button>
       </div>
     </div>
-    <div class="main" id="main"></div>`;
+    <div class="main ${isRegie?'wide':''}" id="main"></div>`;
   renderMain();
 }
 
-function renderMain(){
-  if(view==='form') renderForm();
-  else if(view==='client') renderClient();
-  else renderAgency();
+function renderMain() {
+  if (view === 'form') renderForm();
+  else if (view === 'client') renderClient();
+  else if (view === 'agency') renderAgency();
+  else if (view === 'detail') renderDetail();
 }
 
-function renderForm(){
-  if(step===steps.length){
-    const com=commerciaux.find(c=>c.id===fd.commercial);
-    $('main').innerHTML=`
+// ─── FORM ───
+function renderForm() {
+  if (formStep === formSteps.length) {
+    $('main').innerHTML = `
       <div class="confirm-wrap">
         <div class="confirm-card">
           <div class="confirm-ring">✓</div>
-          <div class="confirm-title">Brief envoyé !</div>
-          <div class="confirm-text">
+          <div style="font-size:20px;font-weight:500;color:var(--navy);margin-bottom:8px">Brief envoyé !</div>
+          <div style="font-size:13.5px;color:var(--gray-600);line-height:1.6;margin-bottom:20px">
             Notre équipe a bien reçu votre demande et vous recontactera sous 48h.
-            ${com?`<br><br><strong style="color:var(--navy)">${com.name}</strong> vous recontactera sous 48h.`:''}
+            ${fd.commercial ? `<br><br><strong style="color:var(--navy)">${commerciaux.find(c=>c.id===fd.commercial)?.name}</strong> vous recontactera sous 48h.` : ''}
           </div>
-          <button class="btn-outline-sky" onclick="step=0;Object.keys(fd).forEach(k=>delete fd[k]);render()">Nouveau brief</button>
+          <button class="btn-sky" onclick="fd={};formStep=0;go('form')">Nouveau brief</button>
           <div class="confirm-sig">The Good Web</div>
         </div>
       </div>`;
     return;
   }
 
-  const dots=steps.map((_,i)=>`<div class="pdot ${i<step?'done':i===step?'cur':''}"></div>`).join('');
-  let body='';
+  const dots = formSteps.map((_,i) => `<div class="pdot ${i<formStep?'done':i===formStep?'cur':''}"></div>`).join('');
+  let body = '';
 
-  if(step===0) body=`
+  if (formStep === 0) body = `
     <div class="card">
       <div class="card-label">Informations client</div>
       <div class="grid2">
@@ -270,41 +387,41 @@ function renderForm(){
       </div>
       <div class="grid2" style="margin-top:4px">
         <div class="field"><label>Budget</label><input id="f-budget" placeholder="Ex : 5 000 €" value="${fd.budget||''}"></div>
-        <div class="field"><label>Email de contact</label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||''}"></div>
+        <div class="field"><label>Email de contact</label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||'${session?.user?.email||''}'}"></div>
       </div>
     </div>`;
 
-  if(step===1){
-    const objs=['Notoriété','Acquisition','Fidélisation','Lancement produit','Autre'];
-    body=`<div class="card">
+  if (formStep === 1) {
+    const objs = ['Notoriété','Acquisition','Fidélisation','Lancement produit','Autre'];
+    body = `<div class="card">
       <div class="card-label">Objectif de campagne</div>
       <div class="field"><label>Objectif principal</label>
         <div class="chips">${objs.map(o=>`<span class="chip ${fd.obj===o?'on':''}" onclick="fd.obj='${o}';renderMain()">${o}</span>`).join('')}</div>
       </div>
       <div class="field" style="margin-top:14px"><label>KPIs attendus</label>
-        <textarea id="f-kpis" placeholder="Ex : reach 500K, taux de clic > 2%, 200 leads…">${fd.kpis||''}</textarea>
+        <textarea id="f-kpis" placeholder="Ex : reach 500K, taux de clic > 2%…">${fd.kpis||''}</textarea>
       </div>
     </div>`;
   }
 
-  if(step===2) body=`
+  if (formStep === 2) body = `
     <div class="card">
       <div class="card-label">Ciblages</div>
-      <div class="field"><label>Ciblage géographique</label><input id="f-geo" placeholder="Ex : France entière, Île-de-France, PACA…" value="${fd.geo||''}"></div>
-      <div class="field" style="margin-top:4px"><label>Ciblage sociodémographique</label><textarea id="f-socio" placeholder="Âge, genre, CSP, situation familiale…">${fd.socio||''}</textarea></div>
+      <div class="field"><label>Ciblage géographique</label><input id="f-geo" placeholder="Ex : France entière, PACA…" value="${fd.geo||''}"></div>
+      <div class="field" style="margin-top:4px"><label>Ciblage sociodémographique</label><textarea id="f-socio" placeholder="Âge, genre, CSP…">${fd.socio||''}</textarea></div>
     </div>
     <div class="card">
       <div class="card-label">Ciblage DATA & contextuel</div>
-      <div class="field"><label>Signaux financiers</label><textarea id="f-fin2" placeholder="Ex : revenus élevés, détenteurs de crédits…" style="min-height:58px">${fd.fin2||''}</textarea></div>
-      <div class="field" style="margin-top:4px"><label>Moments de vie</label><textarea id="f-moments" placeholder="Ex : déménagement, naissance, mariage…" style="min-height:58px">${fd.moments||''}</textarea></div>
-      <div class="field" style="margin-top:4px"><label>Intentions d'achat</label><textarea id="f-intent" placeholder="Ex : recherche active véhicule, voyage prévu…" style="min-height:58px">${fd.intent||''}</textarea></div>
+      <div class="field"><label>Signaux financiers</label><textarea id="f-fin2" placeholder="Ex : revenus élevés, crédits…" style="min-height:52px">${fd.fin2||''}</textarea></div>
+      <div class="field" style="margin-top:4px"><label>Moments de vie</label><textarea id="f-moments" placeholder="Ex : déménagement, naissance…" style="min-height:52px">${fd.moments||''}</textarea></div>
+      <div class="field" style="margin-top:4px"><label>Intentions d'achat</label><textarea id="f-intent" placeholder="Ex : recherche véhicule…" style="min-height:52px">${fd.intent||''}</textarea></div>
     </div>`;
 
-  if(step===3){
-    const fmts=['Vidéo','Display','Story','Post réseaux sociaux'];
-    body=`<div class="card">
+  if (formStep === 3) {
+    const fmts = ['Vidéo','Display','Story','Post réseaux sociaux'];
+    body = `<div class="card">
       <div class="card-label">Formats & créas</div>
-      <div class="field"><label>Formats à disposition</label>
+      <div class="field"><label>Formats disponibles</label>
         <div class="chips">
           ${fmts.map(f=>`<span class="chip ${(fd.fmts||[]).includes(f)?'on':''}" onclick="tFmt('${f}')">${f}</span>`).join('')}
           <span class="chip ${(fd.fmts||[]).includes('reco')?'on':''}" onclick="tFmt('reco')">✦ Selon vos recommandations de plan média</span>
@@ -319,140 +436,271 @@ function renderForm(){
     </div>`;
   }
 
-  if(step===4){
-    const tags=(fd.urls||[]).map(u=>`<span class="url-tag">${u}<button onclick="rUrl('${u}')">×</button></span>`).join('');
-    body=`<div class="card">
+  if (formStep === 4) {
+    const tags = (fd.urls||[]).map(u=>`<span class="url-tag">${u}<button onclick="rUrl('${u}')">×</button></span>`).join('');
+    body = `<div class="card">
       <div class="card-label">URL de redirection</div>
       <div class="field"><label>URL principale</label><input id="f-url" type="url" placeholder="https://…" value="${fd.urlMain||''}"></div>
       <div class="field" style="margin-top:8px">
         <label>URLs secondaires <span style="font-size:11px;color:var(--gray-400)">(optionnel)</span></label>
         <div id="url-tags" style="margin-bottom:4px">${tags}</div>
-        <div class="url-add">
-          <input id="url-inp" type="url" placeholder="https://…">
-          <button onclick="aUrl()">+ Ajouter</button>
-        </div>
+        <div class="url-add"><input id="url-inp" type="url" placeholder="https://…"><button onclick="aUrl()">+ Ajouter</button></div>
       </div>
     </div>`;
   }
 
-  if(step===5){
-    body=`<div class="card">
-      <div class="card-label">Contact commercial</div>
-      <p style="font-size:13px;color:var(--gray-400);margin-bottom:16px">Quel commercial suit ce compte ?</p>
-      ${commerciaux.map(c=>`
-        <div class="com-card ${fd.commercial===c.id?'on':''}" onclick="fd.commercial='${c.id}';renderMain()">
-          <div class="com-avatar">${c.init}</div>
-          <div>
-            <div class="com-name">${c.name}</div>
-            <div class="com-role">${c.role}</div>
-          </div>
-          ${fd.commercial===c.id?`<span class="com-check">✓</span>`:''}
-        </div>`).join('')}
-    </div>`;
-  }
+  if (formStep === 5) body = `<div class="card">
+    <div class="card-label">Contact commercial</div>
+    <p style="font-size:13px;color:var(--gray-400);margin-bottom:16px">Quel commercial suit ce compte ?</p>
+    ${commerciaux.map(c=>`
+      <div class="com-card ${fd.commercial===c.id?'on':''}" onclick="fd.commercial='${c.id}';renderMain()">
+        <div class="com-avatar">${c.init}</div>
+        <div><div style="font-size:14px;font-weight:500;color:var(--gray-800)">${c.name}</div><div style="font-size:11.5px;color:var(--gray-400)">${c.role}</div></div>
+        ${fd.commercial===c.id?`<span style="margin-left:auto;color:var(--sky);font-size:18px">✓</span>`:''}
+      </div>`).join('')}
+  </div>`;
 
-  $('main').innerHTML=`
+  $('main').innerHTML = `
     <div class="step-header">
       <div class="step-info">
         <div class="step-title">Nouveau brief</div>
-        <div class="step-meta">Étape ${step+1} sur ${steps.length} — ${steps[step]}</div>
+        <div class="step-meta">Étape ${formStep+1}/${formSteps.length} — ${formSteps[formStep]}</div>
       </div>
       <div class="progress">${dots}</div>
     </div>
     ${body}
     <div class="btn-row">
-      ${step>0?`<button class="btn-back" onclick="save();step--;renderMain()">← Retour</button>`:`<span></span>`}
-      <button class="btn-next" onclick="save();${step<steps.length-1?'step++;renderMain()':'step=steps.length;renderMain()'}">
-        ${step===steps.length-1?'Envoyer le brief':'Suivant →'}
-      </button>
+      ${formStep>0?`<button class="btn-back" onclick="saveStep();formStep--;renderMain()">← Retour</button>`:`<span></span>`}
+      <button class="btn-next" onclick="handleNext()">${formStep===formSteps.length-1?'Envoyer le brief':'Suivant →'}</button>
     </div>`;
 }
 
-function renderClient(){
-  $('main').innerHTML=`
-    <div class="page-title">Mon espace</div>
-    <div class="page-sub">Vos campagnes uniquement</div>
-    <div class="stat-grid">
-      <div class="stat"><div class="stat-n">${clientBriefs.length}</div><div class="stat-l">Mes briefs</div></div>
-      <div class="stat"><div class="stat-n" style="color:var(--navy)">${clientBriefs.filter(b=>b.status==='new').length}</div><div class="stat-l">En attente</div></div>
-      <div class="stat"><div class="stat-n" style="color:var(--green)">${clientBriefs.filter(b=>b.status==='done').length}</div><div class="stat-l">Traités</div></div>
+async function handleNext() {
+  saveStep();
+  if (formStep === formSteps.length - 1) {
+    await submitBrief();
+  } else {
+    formStep++;
+    renderMain();
+  }
+}
+
+async function submitBrief() {
+  const btn = document.querySelector('.btn-next');
+  if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+  const { error } = await sb.from('briefs').insert([{
+    user_id: session.user.id,
+    compte: fd.compte,
+    campagne: fd.camp,
+    debut: fd.deb,
+    fin: fd.fin,
+    budget: fd.budget,
+    email_contact: fd.email,
+    objectif: fd.obj,
+    kpis: fd.kpis,
+    geo: fd.geo,
+    socio: fd.socio,
+    signaux_financiers: fd.fin2,
+    moments_vie: fd.moments,
+    intentions: fd.intent,
+    formats: fd.fmts ? fd.fmts.join(', ') : '',
+    creas: fd.creas,
+    url_principale: fd.urlMain,
+    urls_secondaires: fd.urls ? fd.urls.join(', ') : '',
+    commercial: fd.commercial,
+    statut: 'nouveau',
+    created_at: new Date().toISOString(),
+  }]);
+  if (error) { console.error(error); if (btn) { btn.disabled = false; btn.textContent = 'Envoyer le brief'; } return; }
+  formStep = formSteps.length;
+  renderMain();
+}
+
+// ─── CLIENT VIEW ───
+async function renderClient() {
+  $('main').innerHTML = `<div class="loading">Chargement…</div>`;
+  const { data, error } = await sb.from('briefs').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false });
+  briefs = data || [];
+  const total = briefs.length;
+  const enCours = briefs.filter(b => ['nouveau','traitement','attente'].includes(b.statut)).length;
+  const gagnes = briefs.filter(b => b.statut === 'gagne').length;
+
+  $('main').innerHTML = `
+    <div class="page-title">Mes briefs</div>
+    <div class="page-sub">${session.user.email}</div>
+    <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat"><div class="stat-n" style="color:var(--navy)">${total}</div><div class="stat-l">Total</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--amber)">${enCours}</div><div class="stat-l">En cours</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--green)">${gagnes}</div><div class="stat-l">Gagnés</div></div>
     </div>
     <div class="card">
       <div class="card-label">Mes campagnes</div>
-      ${clientBriefs.map(b=>`
-        <div class="brief-row">
-          <div class="b-avatar">${b.init}</div>
-          <div class="b-info">
-            <div class="b-name">${b.camp}</div>
-            <div class="b-meta">${b.obj} · ${b.date}</div>
-          </div>
-          <span class="badge ${b.status==='new'?'badge-new':b.status==='prog'?'badge-prog':'badge-done'}">${b.status==='new'?'Reçu':b.status==='prog'?'En cours':'Traité'}</span>
-        </div>`).join('')}
-    </div>
-    <div class="card">
-      <div class="card-label">Activité récente</div>
-      <ul class="tl">
-        <li class="tl-item"><div class="tl-dot"></div><div class="tl-line"></div><div><div class="tl-text">Brief <strong>Rentrée 2025</strong> reçu et pris en charge</div><div class="tl-date">Aujourd'hui, 09h14</div></div></li>
-        <li class="tl-item"><div class="tl-dot"></div><div><div class="tl-text">Votre contact <strong>Jérôme</strong> vous recontacte sous 48h</div><div class="tl-date">Aujourd'hui, 09h14</div></div></li>
-      </ul>
+      ${briefs.length === 0 ? `<div style="font-size:13px;color:var(--gray-400);padding:16px 0;text-align:center">Aucun brief déposé pour l'instant.</div>` :
+        briefs.map(b => {
+          const st = STATUTS.find(s=>s.id===b.statut) || STATUTS[0];
+          const init = (b.compte||'?').substring(0,2).toUpperCase();
+          const date = new Date(b.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+          return `<div class="brief-row" onclick="openDetail('${b.id}')">
+            <div class="b-avatar">${init}</div>
+            <div class="b-info">
+              <div class="b-name">${b.campagne||'Sans titre'}</div>
+              <div class="b-meta">${b.objectif||''} · ${date}</div>
+            </div>
+            <span class="badge ${st.badge}">${st.label}</span>
+          </div>`;
+        }).join('')}
     </div>
     <button class="btn-next" onclick="go('form')">+ Déposer un nouveau brief</button>`;
 }
 
-function renderAgency(){
-  const filtered=agFilter==='all'?allBriefs:allBriefs.filter(b=>b.commercial===agFilter);
-  const counts={};
-  commerciaux.forEach(c=>{counts[c.id]=allBriefs.filter(b=>b.commercial===c.id).length});
+// ─── AGENCY VIEW ───
+async function renderAgency() {
+  $('main').innerHTML = `<div class="loading">Chargement…</div>`;
+  const { data } = await sb.from('briefs').select('*').order('created_at', { ascending: false });
+  briefs = data || [];
 
-  $('main').innerHTML=`
+  const filtered = briefs.filter(b => {
+    const matchCom = agFilter === 'all' || b.commercial === agFilter;
+    const matchStat = statFilter === 'all' || b.statut === statFilter;
+    return matchCom && matchStat;
+  });
+
+  const counts = {};
+  commerciaux.forEach(c => { counts[c.id] = briefs.filter(b=>b.commercial===c.id).length; });
+
+  $('main').innerHTML = `
     <div class="page-title">Tableau de bord</div>
-    <div class="page-sub">Tous les briefs clients — vue agence</div>
+    <div class="page-sub">Tous les briefs clients</div>
     <div class="stat-grid">
-      <div class="stat"><div class="stat-n">${allBriefs.length}</div><div class="stat-l">Briefs reçus</div></div>
-      <div class="stat"><div class="stat-n" style="color:var(--navy)">${allBriefs.filter(b=>b.status==='new').length}</div><div class="stat-l">Nouveaux</div></div>
-      <div class="stat"><div class="stat-n" style="color:var(--amber)">${allBriefs.filter(b=>b.status==='prog').length}</div><div class="stat-l">En cours</div></div>
+      <div class="stat"><div class="stat-n">${briefs.length}</div><div class="stat-l">Total</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--navy)">${briefs.filter(b=>b.statut==='nouveau').length}</div><div class="stat-l">Nouveaux</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--amber)">${briefs.filter(b=>b.statut==='traitement'||b.statut==='attente').length}</div><div class="stat-l">En cours</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--green)">${briefs.filter(b=>b.statut==='gagne').length}</div><div class="stat-l">Gagnés</div></div>
     </div>
     <div class="card">
-      <div class="card-label">Filtrer par commercial</div>
-      <div class="filter-bar">
-        <button class="filter-btn ${agFilter==='all'?'on':''}" onclick="agFilter='all';renderMain()">Tous (${allBriefs.length})</button>
-        ${commerciaux.map(c=>`<button class="filter-btn ${agFilter===c.id?'on':''}" onclick="agFilter='${c.id}';renderMain()">${c.name} (${counts[c.id]})</button>`).join('')}
+      <div class="card-label">Filtres</div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.06em">Commercial</div>
+        <div class="filter-bar">
+          <button class="filter-btn ${agFilter==='all'?'on':''}" onclick="agFilter='all';renderMain()">Tous</button>
+          ${commerciaux.map(c=>`<button class="filter-btn ${agFilter===c.id?'on':''}" onclick="agFilter='${c.id}';renderMain()">${c.name} (${counts[c.id]})</button>`).join('')}
+        </div>
       </div>
-      ${filtered.map(b=>`
-        <div class="brief-row">
-          <div class="b-avatar">${b.init}</div>
-          <div class="b-info">
-            <div class="b-name">${b.name} — ${b.camp}</div>
-            <div class="b-meta">${b.obj} · ${b.date} · <span style="color:var(--sky)">${commerciaux.find(c=>c.id===b.commercial)?.name}</span></div>
-          </div>
-          <span class="badge ${b.status==='new'?'badge-new':b.status==='prog'?'badge-prog':'badge-done'}">${b.status==='new'?'Nouveau':b.status==='prog'?'En cours':'Traité'}</span>
-        </div>`).join('')}
+      <div>
+        <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.06em">Statut</div>
+        <div class="filter-bar">
+          <button class="filter-btn ${statFilter==='all'?'on':''}" onclick="statFilter='all';renderMain()">Tous</button>
+          ${STATUTS.map(s=>`<button class="filter-btn ${statFilter===s.id?'on':''}" onclick="statFilter='${s.id}';renderMain()">${s.label}</button>`).join('')}
+        </div>
+      </div>
     </div>
     <div class="card">
-      <div class="card-label">Répartition par commercial</div>
-      ${commerciaux.map(c=>{
-        const n=counts[c.id],pct=Math.round(n/allBriefs.length*100);
-        return `<div class="bar-row">
-          <div class="com-avatar" style="width:30px;height:30px;font-size:10px;flex-shrink:0">${c.init}</div>
-          <div style="font-size:13px;color:var(--gray-600);width:76px;flex-shrink:0">${c.name}</div>
-          <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-          <div style="font-size:12px;color:var(--gray-400);width:52px;text-align:right">${n} brief${n>1?'s':''}</div>
-        </div>`;
-      }).join('')}
+      <div class="card-label">Briefs (${filtered.length})</div>
+      ${filtered.length === 0 ? `<div style="font-size:13px;color:var(--gray-400);padding:16px 0;text-align:center">Aucun brief pour ces filtres.</div>` :
+        filtered.map(b => {
+          const st = STATUTS.find(s=>s.id===b.statut) || STATUTS[0];
+          const com = commerciaux.find(c=>c.id===b.commercial);
+          const init = (b.compte||'?').substring(0,2).toUpperCase();
+          const date = new Date(b.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+          return `<div class="brief-row" onclick="openDetail('${b.id}')">
+            <div class="b-avatar">${init}</div>
+            <div class="b-info">
+              <div class="b-name">${b.compte||'?'} — ${b.campagne||'Sans titre'}</div>
+              <div class="b-meta">${b.objectif||''} · ${date}${com?' · <span style="color:var(--sky)">'+com.name+'</span>':''}</div>
+            </div>
+            <span class="badge ${st.badge}">${st.label}</span>
+          </div>`;
+        }).join('')}
     </div>`;
 }
 
-function save(){
-  if(step===0){['compte','camp','deb','fin','budget','email'].forEach(k=>{const e=$('f-'+k);if(e)fd[k]=e.value});}
-  if(step===1){const e=$('f-kpis');if(e)fd.kpis=e.value;}
-  if(step===2){['geo','socio','fin2','moments','intent'].forEach(k=>{const e=$('f-'+k);if(e)fd[k]=e.value});}
-  if(step===4){const e=$('f-url');if(e)fd.urlMain=e.value;}
+// ─── DETAIL ───
+async function openDetail(id) {
+  detailBrief = briefs.find(b => b.id === id) || null;
+  if (!detailBrief) {
+    const { data } = await sb.from('briefs').select('*').eq('id', id).single();
+    detailBrief = data;
+  }
+  view = 'detail';
+  renderMain();
+}
+
+function renderDetail() {
+  if (!detailBrief) return;
+  const b = detailBrief;
+  const st = STATUTS.find(s=>s.id===b.statut) || STATUTS[0];
+  const com = commerciaux.find(c=>c.id===b.commercial);
+  const isRegie = userRole === 'regie';
+  const date = new Date(b.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+
+  $('main').innerHTML = `
+    <button class="btn-back-link" onclick="go(isRegie?'agency':'client')">← Retour</button>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <div>
+        <div class="page-title">${b.campagne||'Sans titre'}</div>
+        <div class="page-sub" style="margin-bottom:0">${b.compte||''} · Déposé le ${date}</div>
+      </div>
+      ${isRegie ? `
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:var(--gray-400)">Statut :</span>
+          <select class="status-select" onchange="updateStatut('${b.id}',this.value)">
+            ${STATUTS.map(s=>`<option value="${s.id}" ${b.statut===s.id?'selected':''}>${s.label}</option>`).join('')}
+          </select>
+        </div>` : `<span class="badge ${st.badge}">${st.label}</span>`}
+    </div>
+    <div class="card">
+      <div class="card-label">Informations générales</div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Compte</div><div class="detail-value">${b.compte||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Objectif</div><div class="detail-value">${b.objectif||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Période</div><div class="detail-value">${b.debut||'—'} → ${b.fin||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Budget</div><div class="detail-value">${b.budget||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Contact</div><div class="detail-value">${b.email_contact||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Commercial</div><div class="detail-value">${com?.name||'—'}</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">Ciblages</div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Géographique</div><div class="detail-value">${b.geo||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Sociodémographique</div><div class="detail-value">${b.socio||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Signaux financiers</div><div class="detail-value">${b.signaux_financiers||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Moments de vie</div><div class="detail-value">${b.moments_vie||'—'}</div></div>
+        <div class="detail-item" style="grid-column:span 2"><div class="detail-label">Intentions d'achat</div><div class="detail-value">${b.intentions||'—'}</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">Formats & URL</div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Formats</div><div class="detail-value">${b.formats||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Créas</div><div class="detail-value">${b.creas||'—'}</div></div>
+        <div class="detail-item" style="grid-column:span 2"><div class="detail-label">URL principale</div><div class="detail-value">${b.url_principale?`<a href="${b.url_principale}" target="_blank" style="color:var(--sky)">${b.url_principale}</a>`:'—'}</div></div>
+        ${b.urls_secondaires?`<div class="detail-item" style="grid-column:span 2"><div class="detail-label">URLs secondaires</div><div class="detail-value">${b.urls_secondaires}</div></div>`:''}
+      </div>
+    </div>
+    ${b.kpis?`<div class="card"><div class="card-label">KPIs</div><div style="font-size:13.5px;color:var(--gray-800);line-height:1.6">${b.kpis}</div></div>`:''}`;
+}
+
+async function updateStatut(id, newStatut) {
+  await sb.from('briefs').update({ statut: newStatut }).eq('id', id);
+  if (detailBrief && detailBrief.id === id) detailBrief.statut = newStatut;
+  const b = briefs.find(b=>b.id===id);
+  if (b) b.statut = newStatut;
+}
+
+// ─── HELPERS ───
+function go(v) { view = v; renderApp(); }
+function saveStep() {
+  if(formStep===0){['compte','camp','deb','fin','budget','email'].forEach(k=>{const e=$('f-'+k);if(e)fd[k]=e.value});}
+  if(formStep===1){const e=$('f-kpis');if(e)fd.kpis=e.value;}
+  if(formStep===2){['geo','socio','fin2','moments','intent'].forEach(k=>{const e=$('f-'+k);if(e)fd[k]=e.value});}
+  if(formStep===4){const e=$('f-url');if(e)fd.urlMain=e.value;}
 }
 function tFmt(v){if(!fd.fmts)fd.fmts=[];fd.fmts.includes(v)?fd.fmts=fd.fmts.filter(f=>f!==v):fd.fmts.push(v);renderMain();}
 function aUrl(){const i=$('url-inp');if(!i||!i.value.trim())return;if(!fd.urls)fd.urls=[];fd.urls.push(i.value.trim());i.value='';const t=$('url-tags');if(t)t.innerHTML=fd.urls.map(u=>`<span class="url-tag">${u}<button onclick="rUrl('${u}')">×</button></span>`).join('');}
 function rUrl(u){fd.urls=(fd.urls||[]).filter(x=>x!==u);const t=$('url-tags');if(t)t.innerHTML=fd.urls.map(v=>`<span class="url-tag">${v}<button onclick="rUrl('${v}')">×</button></span>`).join('');}
-function go(v){view=v;render();}
-render();
+
+init();
 </script>
 </body>
 </html>
