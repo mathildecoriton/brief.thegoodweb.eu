@@ -37,7 +37,12 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+    console.log('Anthropic response status:', response.status);
+    console.log('Anthropic data:', JSON.stringify(data).substring(0, 500));
     const text = data.content?.find(c => c.type === 'text')?.text || '';
+    if (!text) {
+      return res.status(200).json({ result: '', debug: data });
+    }
     return res.status(200).json({ result: text });
   } catch (err) {
     return res.status(500).json({ error: err.message });
