@@ -269,7 +269,16 @@ function renderLoginForm() {
     <div class="auth-title">Bienvenue</div>
     <div class="auth-sub">Connectez-vous à votre espace</div>
     <div class="field"><label>Email</label><input id="auth-email" type="email" placeholder="votre@email.com"></div>
-    <div class="field"><label>Mot de passe</label><input id="auth-pwd" type="password" placeholder="••••••••"></div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <div style="position:relative">
+        <input id="auth-pwd" type="password" placeholder="••••••••" style="padding-right:40px">
+        <button onclick="togglePwd('auth-pwd',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:0;line-height:1">👁</button>
+      </div>
+    </div>
+    <div style="text-align:right;margin-bottom:12px;margin-top:-8px">
+      <button onclick="showForgot()" style="background:none;border:none;font-size:12px;color:var(--sky);cursor:pointer;font-family:var(--font)">Mot de passe oublié ?</button>
+    </div>
     <button class="btn-primary" onclick="doLogin()">Se connecter</button>
     <div class="divider">ou</div>
     <button class="btn-google" onclick="doGoogle()">
@@ -284,7 +293,13 @@ function renderSignupForm() {
     <div class="auth-sub">Acces client The Good Web</div>
     <div class="field"><label>Nom de l'entreprise</label><input id="auth-company" type="text" placeholder="Votre entreprise"></div>
     <div class="field"><label>Email</label><input id="auth-email" type="email" placeholder="votre@email.com"></div>
-    <div class="field"><label>Mot de passe</label><input id="auth-pwd" type="password" placeholder="8 caracteres minimum"></div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <div style="position:relative">
+        <input id="auth-pwd" type="password" placeholder="8 caracteres minimum" style="padding-right:40px">
+        <button onclick="togglePwd('auth-pwd',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:0;line-height:1">👁</button>
+      </div>
+    </div>
     <button class="btn-primary" onclick="doSignup()">Créer mon compte</button>
     <div style="text-align:center;margin-top:14px"><button style="background:none;border:none;font-size:12px;color:var(--gray-400);cursor:pointer;font-family:var(--font)" onclick="setAuthMode('login')">Vous avez un compte ? Se connecter</button></div>`;
 }
@@ -699,6 +714,59 @@ function saveStep() {
 function tFmt(v){if(!fd.fmts)fd.fmts=[];fd.fmts.includes(v)?fd.fmts=fd.fmts.filter(f=>f!==v):fd.fmts.push(v);renderMain();}
 function aUrl(){const i=$('url-inp');if(!i||!i.value.trim())return;if(!fd.urls)fd.urls=[];fd.urls.push(i.value.trim());i.value='';const t=$('url-tags');if(t)t.innerHTML=fd.urls.map(u=>`<span class="url-tag">${u}<button onclick="rUrl('${u}')">×</button></span>`).join('');}
 function rUrl(u){fd.urls=(fd.urls||[]).filter(x=>x!==u);const t=$('url-tags');if(t)t.innerHTML=fd.urls.map(v=>`<span class="url-tag">${v}<button onclick="rUrl('${v}')">×</button></span>`).join('');}
+
+
+// ─── FORGOT PASSWORD ───
+function showForgot() {
+  const card = document.querySelector('.auth-card');
+  if (!card) return;
+  card.innerHTML = `
+    <div class="auth-logo">
+      <span class="auth-logo-main">THE GOOD WEB</span>
+      <span class="auth-logo-sub">· THE GOOD AUDIENCE</span>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+    <div class="auth-title">Mot de passe oublié</div>
+    <div class="auth-sub" style="margin-bottom:20px">Entrez votre email pour recevoir un lien de réinitialisation.</div>
+    <div class="field"><label>Email</label><input id="forgot-email" type="email" placeholder="votre@email.com"></div>
+    <button class="btn-primary" onclick="doForgot()">Envoyer le lien</button>
+    <div style="text-align:center;margin-top:14px">
+      <button style="background:none;border:none;font-size:12px;color:var(--gray-400);cursor:pointer;font-family:var(--font)" onclick="renderAuth()">← Retour à la connexion</button>
+    </div>`;
+}
+
+async function doForgot() {
+  const email = document.getElementById('forgot-email')?.value;
+  if (!email) return;
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin
+  });
+  const el = document.getElementById('auth-error');
+  if (el) {
+    el.style.display = 'block';
+    if (error) {
+      el.style.background = 'var(--red-light)';
+      el.style.color = 'var(--red)';
+      el.textContent = 'Erreur, veuillez réessayer.';
+    } else {
+      el.style.background = 'var(--green-light)';
+      el.style.color = 'var(--green)';
+      el.textContent = 'Email envoyé ! Vérifiez votre boite mail.';
+    }
+  }
+}
+
+function togglePwd(id, btn) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+  }
+}
 
 function setAuthMode(m){authMode=m;renderAuth();}
 init();
