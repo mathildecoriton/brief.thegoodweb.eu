@@ -651,7 +651,7 @@ async function renderClient() {
       <div class="page-title">Mes briefs</div>
       <div style="display:flex;gap:6px">
         <button onclick="clientArchiveFilter='active';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${clientArchiveFilter==='active'?'var(--sky)':'var(--gray-200)'};background:${clientArchiveFilter==='active'?'var(--sky-light)':'#fff'};color:${clientArchiveFilter==='active'?'var(--navy)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${clientArchiveFilter==='active'?'500':'400'}">Actifs</button>
-        <button onclick="clientArchiveFilter='archived';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${clientArchiveFilter==='archived'?'var(--amber)':'var(--gray-200)'};background:${clientArchiveFilter==='archived'?'var(--amber-light)':'#fff'};color:${clientArchiveFilter==='archived'?'var(--amber)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${clientArchiveFilter==='archived'?'500':'400'}">📦 Archives</button>
+        <button onclick="clientArchiveFilter='archived';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${clientArchiveFilter==='archived'?'var(--amber)':'var(--gray-200)'};background:${clientArchiveFilter==='archived'?'var(--amber-light)':'#fff'};color:${clientArchiveFilter==='archived'?'var(--amber)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${clientArchiveFilter==='archived'?'500':'400'}">🗑️ Archives</button>
       </div>
     </div>
     <div class="page-sub">${session.user.email}</div>
@@ -680,7 +680,7 @@ async function renderClient() {
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
               <span class="badge ${st.badge}">${st.label}</span>
-              <button onclick="event.stopPropagation();toggleArchive('${b.id}',${b.archived?'true':'false'})" title="${b.archived?'Restaurer':'Archiver'}" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0">${b.archived?'↩':'🗑️'}</button>
+              <button onclick="event.stopPropagation();toggleArchive('${b.id}',!!${b.archived})" title="${b.archived?'Restaurer':'Archiver'}" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0">${b.archived?'↩':'🗑️'}</button>
             </div>
           </div>`;
         }).join('')}
@@ -713,7 +713,7 @@ async function renderAgency() {
       <div class="page-title">Tableau de bord</div>
       <div style="display:flex;gap:6px">
         <button onclick="agArchiveFilter='active';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${agArchiveFilter==='active'?'var(--sky)':'var(--gray-200)'};background:${agArchiveFilter==='active'?'var(--sky-light)':'#fff'};color:${agArchiveFilter==='active'?'var(--navy)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${agArchiveFilter==='active'?'500':'400'}">Actifs</button>
-        <button onclick="agArchiveFilter='archived';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${agArchiveFilter==='archived'?'var(--amber)':'var(--gray-200)'};background:${agArchiveFilter==='archived'?'var(--amber-light)':'#fff'};color:${agArchiveFilter==='archived'?'var(--amber)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${agArchiveFilter==='archived'?'500':'400'}">📦 Archives (${briefs.filter(b=>b.archived).length})</button>
+        <button onclick="agArchiveFilter='archived';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${agArchiveFilter==='archived'?'var(--amber)':'var(--gray-200)'};background:${agArchiveFilter==='archived'?'var(--amber-light)':'#fff'};color:${agArchiveFilter==='archived'?'var(--amber)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${agArchiveFilter==='archived'?'500':'400'}">🗑️ Archives (${briefs.filter(b=>b.archived).length})</button>
       </div>
     </div>
     <div class="page-sub">Tous les briefs clients</div>
@@ -772,7 +772,7 @@ async function renderAgency() {
               <select class="status-select ${st.badge}" onchange="updateStatutInline('${b.id}',this.value,this)" onclick="event.stopPropagation()">
                 ${STATUTS.map(s=>`<option value="${s.id}" ${b.statut===s.id?'selected':''}>${s.label}</option>`).join('')}
               </select>
-              <button onclick="event.stopPropagation();toggleArchive('${b.id}',${b.archived?'true':'false'})" title="${b.archived?'Restaurer':'Archiver'}" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0">${b.archived?'↩':'🗑️'}</button>
+              <button onclick="event.stopPropagation();toggleArchive('${b.id}',!!${b.archived})" title="${b.archived?'Restaurer':'Archiver'}" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0">${b.archived?'↩':'🗑️'}</button>
             </div>
           </div>`;
         }).join('')}
@@ -812,7 +812,7 @@ function renderDetail() {
           <select class="status-select" onchange="updateStatut('${b.id}',this.value)">
             ${STATUTS.map(s=>`<option value="${s.id}" ${b.statut===s.id?'selected':''}>${s.label}</option>`).join('')}
           </select>
-          <button onclick="toggleArchive('${b.id}',${b.archived?'true':'false'})" style="padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:500">
+          <button onclick="toggleArchive('${b.id}',!!${b.archived})" style="padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:500">
             ${b.archived ? '↩ Restaurer' : '📦 Archiver'}
           </button>
         </div>` : `<span class="badge ${st.badge}">${st.label}</span>`}
@@ -871,16 +871,17 @@ function renderDetail() {
 
 async function toggleArchive(id, isArchived) {
   const newVal = !isArchived;
-  await sb.from('briefs').update({ archived: newVal }).eq('id', id);
+  const { error } = await sb.from('briefs').update({ archived: newVal }).eq('id', id);
+  if (error) { console.error('Archive error:', error); return; }
   if (detailBrief && detailBrief.id === id) detailBrief.archived = newVal;
-  const b = briefs.find(b=>b.id===id);
+  const b = briefs.find(b => b.id === id);
   if (b) b.archived = newVal;
-  // Stay on current view and re-render
   if (view === 'detail') {
     renderMain();
+  } else if (userRole === 'regie') {
+    await renderAgency();
   } else {
-    if (userRole === 'regie') await renderAgency();
-    else await renderClient();
+    await renderClient();
   }
 }
 
