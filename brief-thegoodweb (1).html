@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>brief.thegoodweb.eu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#001858;
+  --navy-deep:#001040;
+  --sky:#79BEFF;
+  --sky-light:#E8F4FF;
+  --sky-mid:#B3DBFF;
+  --orange:#F3562D;
+  --white:#ffffff;
+  --gray-50:#f9fafb;
+  --gray-100:#f3f4f6;
+  --gray-200:#e5e7eb;
+  --gray-400:#9ca3af;
+  --gray-600:#4b5563;
+  --gray-800:#1f2937;
+  --green:#16a34a;
+  --green-light:#dcfce7;
+  --amber:#d97706;
+  --amber-light:#fef3c7;
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+html,body{height:100%;font-family:var(--font);background:var(--gray-50);color:var(--gray-800)}
+.app{display:flex;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:var(--navy);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 0 rgba(255,255,255,.06)}
+.logo{display:flex;flex-direction:column;line-height:1.1;gap:1px}
+.logo-main{font-size:14px;font-weight:600;color:#fff;letter-spacing:.05em}
+.logo-sub{font-size:8.5px;color:var(--sky);letter-spacing:.12em;font-weight:400}
+.topbar-nav{display:flex;align-items:center;gap:4px}
+.nav-btn{padding:6px 16px;border-radius:100px;font-size:12.5px;font-weight:400;cursor:pointer;color:rgba(255,255,255,.65);border:none;background:none;font-family:var(--font);transition:all .15s;letter-spacing:.01em}
+.nav-btn:hover{color:#fff}
+.nav-btn.active{background:rgba(255,255,255,.1);color:#fff}
+.nav-btn.cta{border:1px solid rgba(121,190,255,.5);color:#fff;opacity:.9;margin-left:4px}
+.nav-btn.cta:hover{border-color:var(--sky);background:rgba(121,190,255,.08);opacity:1}
+.nav-btn.cta.active{background:rgba(121,190,255,.12);border-color:var(--sky);color:#fff}
+
+/* MAIN */
+.main{flex:1;padding:32px 24px;max-width:640px;margin:0 auto;width:100%}
+
+/* HEADINGS */
+.page-title{font-size:22px;font-weight:500;color:var(--navy);margin-bottom:4px}
+.page-sub{font-size:13.5px;color:var(--gray-400);margin-bottom:24px}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--gray-200);border-radius:14px;padding:20px;margin-bottom:12px}
+.card-label{font-size:10.5px;font-weight:500;color:var(--sky);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.card-label::before{content:'';width:3px;height:12px;background:var(--sky);border-radius:2px;display:inline-block}
+
+/* FORM FIELDS */
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12.5px;color:var(--gray-600);margin-bottom:5px;font-weight:500}
+.field input,.field select,.field textarea{
+  width:100%;font-size:14px;border:1px solid var(--gray-200);border-radius:9px;
+  padding:9px 12px;background:#fff;color:var(--gray-800);outline:none;
+  transition:border .15s,box-shadow .15s;font-family:var(--font)
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--sky);box-shadow:0 0 0 3px rgba(121,190,255,.15)
+}
+.field textarea{resize:vertical;min-height:72px;line-height:1.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;padding:6px 13px;
+  border:1px solid var(--gray-200);border-radius:100px;font-size:13px;
+  cursor:pointer;color:var(--gray-600);background:#fff;
+  transition:all .15s;user-select:none;font-family:var(--font)
+}
+.chip:hover{border-color:var(--sky-mid)}
+.chip.on{border-color:var(--sky);color:var(--navy);background:var(--sky-light);font-weight:500}
+
+/* TOGGLE */
+.toggle-row{display:flex;gap:8px;margin-top:6px}
+.tog{
+  flex:1;padding:9px;border:1px solid var(--gray-200);border-radius:9px;
+  font-size:13.5px;cursor:pointer;background:#fff;color:var(--gray-600);
+  transition:all .15s;text-align:center;font-family:var(--font)
+}
+.tog:hover{border-color:var(--sky-mid)}
+.tog.on{border-color:var(--sky);background:var(--sky-light);color:var(--navy);font-weight:500}
+
+/* COMMERCIAL CARDS */
+.com-card{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border:1px solid var(--gray-200);border-radius:11px;cursor:pointer;
+  transition:all .15s;margin-bottom:8px
+}
+.com-card:last-child{margin-bottom:0}
+.com-card:hover{border-color:var(--sky-mid)}
+.com-card.on{border-color:var(--sky);background:var(--sky-light)}
+.com-avatar{
+  width:38px;height:38px;border-radius:50%;background:var(--sky-light);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  font-weight:600;color:var(--navy);flex-shrink:0;border:1px solid var(--gray-200);
+  font-family:var(--mono)
+}
+.com-card.on .com-avatar{background:#fff;border-color:var(--sky)}
+.com-name{font-size:14px;color:var(--gray-800);font-weight:500}
+.com-role{font-size:11.5px;color:var(--gray-400);margin-top:1px}
+.com-check{margin-left:auto;color:var(--sky);font-size:18px}
+
+/* PROGRESS */
+.step-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.step-info .step-title{font-size:21px;font-weight:500;color:var(--navy)}
+.step-info .step-meta{font-size:12.5px;color:var(--gray-400);margin-top:2px}
+.progress{display:flex;gap:5px;align-items:center}
+.pdot{height:3px;width:30px;border-radius:3px;background:var(--gray-200);transition:background .3s}
+.pdot.done{background:var(--sky)}
+.pdot.cur{background:rgba(121,190,255,.45)}
+
+/* BUTTONS */
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.btn-back{background:none;border:1px solid var(--gray-200);border-radius:9px;padding:9px 20px;font-size:13.5px;cursor:pointer;color:var(--gray-600);font-family:var(--font);transition:all .15s}
+.btn-back:hover{border-color:var(--gray-400)}
+.btn-next{background:var(--navy);border:none;border-radius:9px;padding:10px 24px;font-size:13.5px;font-weight:500;cursor:pointer;color:#fff;font-family:var(--font);transition:opacity .15s;display:flex;align-items:center;gap:6px}
+.btn-next:hover{opacity:.85}
+.btn-outline-sky{background:var(--sky-light);border:1px solid var(--sky);border-radius:9px;padding:10px 24px;font-size:13.5px;font-weight:500;cursor:pointer;color:var(--navy);font-family:var(--font)}
+
+/* URL */
+.url-add{display:flex;gap:8px;margin-top:8px}
+.url-add input{flex:1;font-size:13.5px;border:1px solid var(--gray-200);border-radius:9px;padding:8px 12px;background:#fff;color:var(--gray-800);outline:none;font-family:var(--font)}
+.url-add input:focus{border-color:var(--sky)}
+.url-add button{padding:0 14px;border:1px solid var(--gray-200);border-radius:9px;background:var(--gray-50);font-size:13px;cursor:pointer;color:var(--gray-600);font-family:var(--font);white-space:nowrap}
+.url-tag{display:inline-flex;align-items:center;gap:5px;background:var(--sky-light);border:1px solid var(--sky-mid);border-radius:100px;padding:3px 10px;font-size:12px;color:var(--navy);margin:4px 4px 0 0}
+.url-tag button{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:14px;line-height:1;padding:0}
+
+/* CONFIRMATION */
+.confirm-wrap{max-width:440px;margin:40px auto}
+.confirm-card{background:#fff;border:1px solid var(--gray-200);border-radius:16px;padding:40px 28px;text-align:center}
+.confirm-ring{width:56px;height:56px;border-radius:50%;background:var(--sky-light);border:2px solid var(--sky);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--navy);font-size:22px}
+.confirm-title{font-size:20px;font-weight:500;color:var(--navy);margin-bottom:8px}
+.confirm-text{font-size:13.5px;color:var(--gray-600);line-height:1.6;margin-bottom:20px}
+.confirm-sig{font-size:11px;font-weight:600;color:var(--navy);letter-spacing:.1em;margin-top:20px;opacity:.35;text-transform:uppercase}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#fff;border:1px solid var(--gray-200);border-radius:12px;padding:16px;text-align:center}
+.stat-n{font-size:28px;font-weight:500;color:var(--navy);font-family:var(--mono)}
+.stat-l{font-size:11px;color:var(--gray-400);margin-top:3px}
+
+/* BRIEF ROWS */
+.brief-row{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--gray-100)}
+.brief-row:last-child{border-bottom:none}
+.b-avatar{width:36px;height:36px;border-radius:50%;background:var(--sky-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--navy);flex-shrink:0;font-family:var(--mono)}
+.b-info{flex:1;min-width:0}
+.b-name{font-size:13.5px;font-weight:500;color:var(--gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.b-meta{font-size:11.5px;color:var(--gray-400);margin-top:2px}
+.badge{display:inline-block;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:500;white-space:nowrap}
+.badge-new{background:var(--sky-light);color:var(--navy)}
+.badge-prog{background:var(--amber-light);color:var(--amber)}
+.badge-done{background:var(--green-light);color:var(--green)}
+
+/* FILTER */
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filter-btn{padding:5px 13px;border-radius:100px;font-size:12px;border:1px solid var(--gray-200);background:#fff;color:var(--gray-600);cursor:pointer;font-family:var(--font);transition:all .15s}
+.filter-btn:hover{border-color:var(--sky-mid)}
+.filter-btn.on{border-color:var(--sky);background:var(--sky-light);color:var(--navy);font-weight:500}
+
+/* TIMELINE */
+.tl{list-style:none}
+.tl-item{display:flex;gap:10px;padding-bottom:14px;position:relative}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--sky);flex-shrink:0;margin-top:4px}
+.tl-line{position:absolute;left:4px;top:14px;bottom:0;width:1px;background:var(--gray-100)}
+.tl-item:last-child .tl-line{display:none}
+.tl-text{font-size:13px;color:var(--gray-800);line-height:1.5}
+.tl-date{font-size:11px;color:var(--gray-400);margin-top:2px}
+
+/* BAR */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-track{flex:1;height:5px;border-radius:3px;background:var(--gray-100);overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;background:var(--sky)}
+
+/* DIVIDER */
+.section-note{font-size:12px;color:var(--gray-400);margin:10px 0 16px;padding:10px 12px;background:var(--gray-50);border-radius:8px;border-left:3px solid var(--sky)}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let view='form',step=0,agFilter='all';
+const fd={};
+
+const commerciaux=[
+  {id:'jerome',name:'Jérôme',role:'Directeur commercial',init:'JR'},
+  {id:'mathilde',name:'Mathilde',role:'Chargée de clientèle',init:'MT'},
+  {id:'leslie',name:'Leslie',role:'Chargée de clientèle',init:'LS'},
+];
+
+const allBriefs=[
+  {id:1,init:'LC',name:'Leclerc Drive',camp:'Rentrée 2025',obj:'Acquisition',date:'28 mai',status:'new',commercial:'jerome',client:'leclerc'},
+  {id:2,init:'OR',name:'Orange Pro',camp:'Offre B2B automne',obj:'Notoriété',date:'26 mai',status:'prog',commercial:'mathilde',client:'orange'},
+  {id:3,init:'BN',name:'BNP Paribas',camp:'Moments de vie',obj:'Fidélisation',date:'22 mai',status:'done',commercial:'leslie',client:'bnp'},
+  {id:4,init:'SG',name:'Société Générale',camp:'Lancement carte',obj:'Lancement',date:'18 mai',status:'done',commercial:'jerome',client:'sg'},
+];
+
+const clientBriefs=allBriefs.filter(b=>b.client==='leclerc');
+const steps=['Infos client','Objectif','Ciblages','Formats','URL','Contact'];
+
+function render(){
+  $('app').innerHTML=`
+    <div class="topbar">
+      <div class="logo">
+        <span class="logo-main">THE GOOD WEB</span>
+        <span class="logo-sub">· THE GOOD AUDIENCE</span>
+      </div>
+      <div class="topbar-nav">
+        <button class="nav-btn ${view==='client'?'active':''}" onclick="go('client')">Mon espace</button>
+        <button class="nav-btn ${view==='agency'?'active':''}" onclick="go('agency')">Tableau de bord</button>
+        <button class="nav-btn cta ${view==='form'?'active':''}" onclick="go('form')">+ Déposer un brief</button>
+      </div>
+    </div>
+    <div class="main" id="main"></div>`;
+  renderMain();
+}
+
+function renderMain(){
+  if(view==='form') renderForm();
+  else if(view==='client') renderClient();
+  else renderAgency();
+}
+
+function renderForm(){
+  if(step===steps.length){
+    const com=commerciaux.find(c=>c.id===fd.commercial);
+    $('main').innerHTML=`
+      <div class="confirm-wrap">
+        <div class="confirm-card">
+          <div class="confirm-ring">✓</div>
+          <div class="confirm-title">Brief envoyé !</div>
+          <div class="confirm-text">
+            Notre équipe a bien reçu votre demande et vous recontactera sous 48h.
+            ${com?`<br><br><strong style="color:var(--navy)">${com.name}</strong> vous recontactera sous 48h.`:''}
+          </div>
+          <button class="btn-outline-sky" onclick="step=0;Object.keys(fd).forEach(k=>delete fd[k]);render()">Nouveau brief</button>
+          <div class="confirm-sig">The Good Web</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const dots=steps.map((_,i)=>`<div class="pdot ${i<step?'done':i===step?'cur':''}"></div>`).join('');
+  let body='';
+
+  if(step===0) body=`
+    <div class="card">
+      <div class="card-label">Informations client</div>
+      <div class="grid2">
+        <div class="field"><label>Compte</label><input id="f-compte" placeholder="Nom du client" value="${fd.compte||''}"></div>
+        <div class="field"><label>Nom de campagne</label><input id="f-camp" placeholder="Ex : Rentrée 2025" value="${fd.camp||''}"></div>
+      </div>
+      <div class="grid2" style="margin-top:4px">
+        <div class="field"><label>Début de campagne</label><input id="f-deb" type="date" value="${fd.deb||''}"></div>
+        <div class="field"><label>Fin de campagne</label><input id="f-fin" type="date" value="${fd.fin||''}"></div>
+      </div>
+      <div class="grid2" style="margin-top:4px">
+        <div class="field"><label>Budget</label><input id="f-budget" placeholder="Ex : 5 000 €" value="${fd.budget||''}"></div>
+        <div class="field"><label>Email de contact</label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||''}"></div>
+      </div>
+    </div>`;
+
+  if(step===1){
+    const objs=['Notoriété','Acquisition','Fidélisation','Lancement produit','Autre'];
+    body=`<div class="card">
+      <div class="card-label">Objectif de campagne</div>
+      <div class="field"><label>Objectif principal</label>
+        <div class="chips">${objs.map(o=>`<span class="chip ${fd.obj===o?'on':''}" onclick="fd.obj='${o}';renderMain()">${o}</span>`).join('')}</div>
+      </div>
+      <div class="field" style="margin-top:14px"><label>KPIs attendus</label>
+        <textarea id="f-kpis" placeholder="Ex : reach 500K, taux de clic > 2%, 200 leads…">${fd.kpis||''}</textarea>
+      </div>
+    </div>`;
+  }
+
+  if(step===2) body=`
+    <div class="card">
+      <div class="card-label">Ciblages</div>
+      <div class="field"><label>Ciblage géographique</label><input id="f-geo" placeholder="Ex : France entière, Île-de-France, PACA…" value="${fd.geo||''}"></div>
+      <div class="field" style="margin-top:4px"><label>Ciblage sociodémographique</label><textarea id="f-socio" placeholder="Âge, genre, CSP, situation familiale…">${fd.socio||''}</textarea></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Ciblage DATA & contextuel</div>
+      <div class="field"><label>Signaux financiers</label><textarea id="f-fin2" placeholder="Ex : revenus élevés, détenteurs de crédits…" style="min-height:58px">${fd.fin2||''}</textarea></div>
+      <div class="field" style="margin-top:4px"><label>Moments de vie</label><textarea id="f-moments" placeholder="Ex : déménagement, naissance, mariage…" style="min-height:58px">${fd.moments||''}</textarea></div>
+      <div class="field" style="margin-top:4px"><label>Intentions d'achat</label><textarea id="f-intent" placeholder="Ex : recherche active véhicule, voyage prévu…" style="min-height:58px">${fd.intent||''}</textarea></div>
+    </div>`;
+
+  if(step===3){
+    const fmts=['Vidéo','Display','Story','Post réseaux sociaux'];
+    body=`<div class="card">
+      <div class="card-label">Formats & créas</div>
+      <div class="field"><label>Formats à disposition</label>
+        <div class="chips">
+          ${fmts.map(f=>`<span class="chip ${(fd.fmts||[]).includes(f)?'on':''}" onclick="tFmt('${f}')">${f}</span>`).join('')}
+          <span class="chip ${(fd.fmts||[]).includes('reco')?'on':''}" onclick="tFmt('reco')">✦ Selon vos recommandations de plan média</span>
+        </div>
+      </div>
+      <div class="field" style="margin-top:16px"><label>Besoin de créas ?</label>
+        <div class="toggle-row">
+          <div class="tog ${fd.creas==='oui'?'on':''}" onclick="fd.creas='oui';renderMain()">Oui</div>
+          <div class="tog ${fd.creas==='non'?'on':''}" onclick="fd.creas='non';renderMain()">Non</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if(step===4){
+    const tags=(fd.urls||[]).map(u=>`<span class="url-tag">${u}<button onclick="rUrl('${u}')">×</button></span>`).join('');
+    body=`<div class="card">
+      <div class="card-label">URL de redirection</div>
+      <div class="field"><label>URL principale</label><input id="f-url" type="url" placeholder="https://…" value="${fd.urlMain||''}"></div>
+      <div class="field" style="margin-top:8px">
+        <label>URLs secondaires <span style="font-size:11px;color:var(--gray-400)">(optionnel)</span></label>
+        <div id="url-tags" style="margin-bottom:4px">${tags}</div>
+        <div class="url-add">
+          <input id="url-inp" type="url" placeholder="https://…">
+          <button onclick="aUrl()">+ Ajouter</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if(step===5){
+    body=`<div class="card">
+      <div class="card-label">Contact commercial</div>
+      <p style="font-size:13px;color:var(--gray-400);margin-bottom:16px">Quel commercial suit ce compte ?</p>
+      ${commerciaux.map(c=>`
+        <div class="com-card ${fd.commercial===c.id?'on':''}" onclick="fd.commercial='${c.id}';renderMain()">
+          <div class="com-avatar">${c.init}</div>
+          <div>
+            <div class="com-name">${c.name}</div>
+            <div class="com-role">${c.role}</div>
+          </div>
+          ${fd.commercial===c.id?`<span class="com-check">✓</span>`:''}
+        </div>`).join('')}
+    </div>`;
+  }
+
+  $('main').innerHTML=`
+    <div class="step-header">
+      <div class="step-info">
+        <div class="step-title">Nouveau brief</div>
+        <div class="step-meta">Étape ${step+1} sur ${steps.length} — ${steps[step]}</div>
+      </div>
+      <div class="progress">${dots}</div>
+    </div>
+    ${body}
+    <div class="btn-row">
+      ${step>0?`<button class="btn-back" onclick="save();step--;renderMain()">← Retour</button>`:`<span></span>`}
+      <button class="btn-next" onclick="save();${step<steps.length-1?'step++;renderMain()':'step=steps.length;renderMain()'}">
+        ${step===steps.length-1?'Envoyer le brief':'Suivant →'}
+      </button>
+    </div>`;
+}
+
+function renderClient(){
+  $('main').innerHTML=`
+    <div class="page-title">Mon espace</div>
+    <div class="page-sub">Vos campagnes uniquement</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-n">${clientBriefs.length}</div><div class="stat-l">Mes briefs</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--navy)">${clientBriefs.filter(b=>b.status==='new').length}</div><div class="stat-l">En attente</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--green)">${clientBriefs.filter(b=>b.status==='done').length}</div><div class="stat-l">Traités</div></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Mes campagnes</div>
+      ${clientBriefs.map(b=>`
+        <div class="brief-row">
+          <div class="b-avatar">${b.init}</div>
+          <div class="b-info">
+            <div class="b-name">${b.camp}</div>
+            <div class="b-meta">${b.obj} · ${b.date}</div>
+          </div>
+          <span class="badge ${b.status==='new'?'badge-new':b.status==='prog'?'badge-prog':'badge-done'}">${b.status==='new'?'Reçu':b.status==='prog'?'En cours':'Traité'}</span>
+        </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-label">Activité récente</div>
+      <ul class="tl">
+        <li class="tl-item"><div class="tl-dot"></div><div class="tl-line"></div><div><div class="tl-text">Brief <strong>Rentrée 2025</strong> reçu et pris en charge</div><div class="tl-date">Aujourd'hui, 09h14</div></div></li>
+        <li class="tl-item"><div class="tl-dot"></div><div><div class="tl-text">Votre contact <strong>Jérôme</strong> vous recontacte sous 48h</div><div class="tl-date">Aujourd'hui, 09h14</div></div></li>
+      </ul>
+    </div>
+    <button class="btn-next" onclick="go('form')">+ Déposer un nouveau brief</button>`;
+}
+
+function renderAgency(){
+  const filtered=agFilter==='all'?allBriefs:allBriefs.filter(b=>b.commercial===agFilter);
+  const counts={};
+  commerciaux.forEach(c=>{counts[c.id]=allBriefs.filter(b=>b.commercial===c.id).length});
+
+  $('main').innerHTML=`
+    <div class="page-title">Tableau de bord</div>
+    <div class="page-sub">Tous les briefs clients — vue agence</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-n">${allBriefs.length}</div><div class="stat-l">Briefs reçus</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--navy)">${allBriefs.filter(b=>b.status==='new').length}</div><div class="stat-l">Nouveaux</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--amber)">${allBriefs.filter(b=>b.status==='prog').length}</div><div class="stat-l">En cours</div></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Filtrer par commercial</div>
+      <div class="filter-bar">
+        <button class="filter-btn ${agFilter==='all'?'on':''}" onclick="agFilter='all';renderMain()">Tous (${allBriefs.length})</button>
+        ${commerciaux.map(c=>`<button class="filter-btn ${agFilter===c.id?'on':''}" onclick="agFilter='${c.id}';renderMain()">${c.name} (${counts[c.id]})</button>`).join('')}
+      </div>
+      ${filtered.map(b=>`
+        <div class="brief-row">
+          <div class="b-avatar">${b.init}</div>
+          <div class="b-info">
+            <div class="b-name">${b.name} — ${b.camp}</div>
+            <div class="b-meta">${b.obj} · ${b.date} · <span style="color:var(--sky)">${commerciaux.find(c=>c.id===b.commercial)?.name}</span></div>
+          </div>
+          <span class="badge ${b.status==='new'?'badge-new':b.status==='prog'?'badge-prog':'badge-done'}">${b.status==='new'?'Nouveau':b.status==='prog'?'En cours':'Traité'}</span>
+        </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-label">Répartition par commercial</div>
+      ${commerciaux.map(c=>{
+        const n=counts[c.id],pct=Math.round(n/allBriefs.length*100);
+        return `<div class="bar-row">
+          <div class="com-avatar" style="width:30px;height:30px;font-size:10px;flex-shrink:0">${c.init}</div>
+          <div style="font-size:13px;color:var(--gray-600);width:76px;flex-shrink:0">${c.name}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+          <div style="font-size:12px;color:var(--gray-400);width:52px;text-align:right">${n} brief${n>1?'s':''}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function save(){
+  if(step===0){['compte','camp','deb','fin','budget','email'].forEach(k=>{const e=$('f-'+k);if(e)fd[k]=e.value});}
+  if(step===1){const e=$('f-kpis');if(e)fd.kpis=e.value;}
+  if(step===2){['geo','socio','fin2','moments','intent'].forEach(k=>{const e=$('f-'+k);if(e)fd[k]=e.value});}
+  if(step===4){const e=$('f-url');if(e)fd.urlMain=e.value;}
+}
+function tFmt(v){if(!fd.fmts)fd.fmts=[];fd.fmts.includes(v)?fd.fmts=fd.fmts.filter(f=>f!==v):fd.fmts.push(v);renderMain();}
+function aUrl(){const i=$('url-inp');if(!i||!i.value.trim())return;if(!fd.urls)fd.urls=[];fd.urls.push(i.value.trim());i.value='';const t=$('url-tags');if(t)t.innerHTML=fd.urls.map(u=>`<span class="url-tag">${u}<button onclick="rUrl('${u}')">×</button></span>`).join('');}
+function rUrl(u){fd.urls=(fd.urls||[]).filter(x=>x!==u);const t=$('url-tags');if(t)t.innerHTML=fd.urls.map(v=>`<span class="url-tag">${v}<button onclick="rUrl('${v}')">×</button></span>`).join('');}
+function go(v){view=v;render();}
+render();
+</script>
+</body>
+</html>
