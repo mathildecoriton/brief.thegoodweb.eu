@@ -981,27 +981,27 @@ async function analyserBrief(id) {
   const b = detailBrief;
   const com = commerciaux.find(c => c.id === b?.commercial);
 
-  const prompt = \`Tu es Goodie, l'assistant média expert de The Good Web, une agence digitale spécialisée en publicité programmatique et social media.
+  const prompt = `Tu es Goodie, l'assistant média expert de The Good Web, une agence digitale spécialisée en publicité programmatique et social media.
 
 Analyse ce brief publicitaire et fournis une analyse structurée en 4 parties en HTML simple (utilise uniquement des balises <div>, <span>, <strong> avec des styles inline) :
 
 BRIEF :
-- Client : \${b?.compte || 'Non renseigné'}
-- Campagne : \${b?.campagne || 'Non renseignée'}
-- Objectif : \${b?.objectif || 'Non renseigné'}
-- Budget : \${b?.budget || 'Non renseigné'}
-- Période : \${b?.debut || '?'} → \${b?.fin || '?'}
-- Ciblage géographique : \${b?.geo || 'Non renseigné'}
-- Ciblage sociodémographique : \${b?.socio || 'Non renseigné'}
-- Signaux financiers : \${b?.signaux_financiers || 'Non renseigné'}
-- Moments de vie : \${b?.moments_vie || 'Non renseigné'}
-- Intentions d'achat : \${b?.intentions || 'Non renseigné'}
-- Formats disponibles : \${b?.formats || 'Non renseigné'}
-- Besoin créas : \${b?.creas || 'Non renseigné'}
-- URL de destination : \${b?.url_principale || 'Non renseignée'}
-- KPIs : \${b?.kpis || 'Non renseignés'}
-- Commercial : \${com?.name || 'Non assigné'}
-- Infos complémentaires : \${b?.infos_complementaires || 'Aucune'}
+- Client : ${b?.compte || 'Non renseigné'}
+- Campagne : ${b?.campagne || 'Non renseignée'}
+- Objectif : ${b?.objectif || 'Non renseigné'}
+- Budget : ${b?.budget || 'Non renseigné'}
+- Période : ${b?.debut || '?'} → ${b?.fin || '?'}
+- Ciblage géographique : ${b?.geo || 'Non renseigné'}
+- Ciblage sociodémographique : ${b?.socio || 'Non renseigné'}
+- Signaux financiers : ${b?.signaux_financiers || 'Non renseigné'}
+- Moments de vie : ${b?.moments_vie || 'Non renseigné'}
+- Intentions d'achat : ${b?.intentions || 'Non renseigné'}
+- Formats disponibles : ${b?.formats || 'Non renseigné'}
+- Besoin créas : ${b?.creas || 'Non renseigné'}
+- URL de destination : ${b?.url_principale || 'Non renseignée'}
+- KPIs : ${b?.kpis || 'Non renseignés'}
+- Commercial : ${com?.name || 'Non assigné'}
+- Infos complémentaires : ${b?.infos_complementaires || 'Aucune'}
 
 Génère exactement cette structure HTML (garde les couleurs et styles) :
 
@@ -1038,7 +1038,7 @@ Génère exactement cette structure HTML (garde les couleurs et styles) :
   [2-3 questions sous forme de <div style="display:flex;gap:8px;margin-bottom:6px"><span style="color:#c084fc;margin-top:2px">?</span><span style="font-size:13px;color:rgba(255,255,255,.85)">[question]</span></div>]
 </div>
 
-Réponds UNIQUEMENT avec le HTML, sans texte avant ni après, sans balises \\`\\`\\`.\`;
+Réponds UNIQUEMENT avec le HTML, sans texte avant ni après, sans balises de code markdown.`
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1090,15 +1090,14 @@ async function analyserTableauBord() {
   // Build briefs summary for Goodie
   const briefsSummary = briefs.map(b => {
     const com = commerciaux.find(c => c.id === b.commercial);
-    return \`- \${b.compte || '?'} | \${b.campagne || '?'} | \${b.objectif || '?'} | Budget: \${b.budget || '?'} | Statut: \${b.statut} | Commercial: \${com?.name || '?'} | Géo: \${b.geo || '?'} | Cible: \${b.socio || '?'} | Formats: \${b.formats || '?'} | Signaux: \${b.signaux_financiers || '?'} | Moments: \${b.moments_vie || '?'}\`;
-  }).join('
-');
+    return `- ${b.compte || '?'} | ${b.campagne || '?'} | ${b.objectif || '?'} | Budget: ${b.budget || '?'} | Statut: ${b.statut} | Commercial: ${com?.name || '?'} | Géo: ${b.geo || '?'} | Cible: ${b.socio || '?'} | Formats: ${b.formats || '?'} | Signaux: ${b.signaux_financiers || '?'} | Moments: ${b.moments_vie || '?'}`;
+  }).join('\n');
 
-  const prompt = \`Tu es Goodie, l'assistant média expert de The Good Web, agence spécialisée en publicité programmatique, social media et data targeting.
+  const prompt = `Tu es Goodie, l'assistant média expert de The Good Web, agence spécialisée en publicité programmatique, social media et data targeting.
 
-Voici le pipeline complet de briefs clients (\${briefs.length} briefs) :
+Voici le pipeline complet de briefs clients (${briefs.length} briefs) :
 
-\${briefsSummary}
+${briefsSummary}
 
 Analyse ce pipeline et génère une vue d'ensemble stratégique en HTML (utilise uniquement <div> et <span> avec styles inline) avec cette structure exacte :
 
@@ -1135,7 +1134,7 @@ Analyse ce pipeline et génère une vue d'ensemble stratégique en HTML (utilise
   [Champs souvent vides ou mal renseignés dans les briefs sous forme de <div style="display:flex;gap:8px;margin-bottom:6px"><span style="color:#c084fc;margin-top:2px">?</span><span style="font-size:13px;color:rgba(255,255,255,.85)">[point manquant et impact]</span></div>]
 </div>
 
-Réponds UNIQUEMENT avec le HTML, sans texte avant ni après.\`;
+Réponds UNIQUEMENT avec le HTML, sans texte avant ni après.`
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
