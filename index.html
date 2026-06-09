@@ -255,6 +255,8 @@ let view = 'form';
 let formStep = 0;
 let agFilter = 'all';
 let statFilter = 'all';
+let agArchiveFilter = 'active';
+let clientArchiveFilter = 'active';
 let dateFrom = '';
 let dateTo = '';
 let fd = {};
@@ -639,12 +641,19 @@ async function renderClient() {
   $('main').innerHTML = `<div class="loading">Chargement…</div>`;
   const { data, error } = await sb.from('briefs').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false });
   briefs = data || [];
-  const total = briefs.length;
-  const enCours = briefs.filter(b => ['nouveau','traitement','attente'].includes(b.statut)).length;
-  const gagnes = briefs.filter(b => b.statut === 'gagne').length;
+  const activeBriefs = briefs.filter(b => clientArchiveFilter === 'archived' ? b.archived : !b.archived);
+  const total = activeBriefs.length;
+  const enCours = activeBriefs.filter(b => ['nouveau','traitement','attente'].includes(b.statut)).length;
+  const gagnes = activeBriefs.filter(b => b.statut === 'gagne').length;
 
   $('main').innerHTML = `
-    <div class="page-title">Mes briefs</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+      <div class="page-title">Mes briefs</div>
+      <div style="display:flex;gap:6px">
+        <button onclick="clientArchiveFilter='active';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${clientArchiveFilter==='active'?'var(--sky)':'var(--gray-200)'};background:${clientArchiveFilter==='active'?'var(--sky-light)':'#fff'};color:${clientArchiveFilter==='active'?'var(--navy)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${clientArchiveFilter==='active'?'500':'400'}">Actifs</button>
+        <button onclick="clientArchiveFilter='archived';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${clientArchiveFilter==='archived'?'var(--amber)':'var(--gray-200)'};background:${clientArchiveFilter==='archived'?'var(--amber-light)':'#fff'};color:${clientArchiveFilter==='archived'?'var(--amber)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${clientArchiveFilter==='archived'?'500':'400'}">📦 Archives</button>
+      </div>
+    </div>
     <div class="page-sub">${session.user.email}</div>
     <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
       <div class="stat"><div class="stat-n" style="color:var(--navy)">${total}</div><div class="stat-l">Total</div></div>
@@ -659,7 +668,7 @@ async function renderClient() {
         <div style="font-size:13px;color:var(--gray-400);margin-bottom:20px;line-height:1.6">Déposez votre premier brief et notre équipe<br>vous recontactera sous 48h.</div>
         <button class="btn-next" onclick="go('form')" style="margin:0 auto">+ Déposer mon premier brief</button>
       </div>` :
-        briefs.map(b => {
+        activeBriefs.map(b => {
           const st = STATUTS.find(s=>s.id===b.statut) || STATUTS[0];
           const init = (b.compte||'?').substring(0,2).toUpperCase();
           const date = new Date(b.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
@@ -689,14 +698,21 @@ async function renderAgency() {
     const bDate = b.created_at ? b.created_at.substring(0,10) : '';
     const matchFrom = !dateFrom || bDate >= dateFrom;
     const matchTo = !dateTo || bDate <= dateTo;
-    return matchCom && matchStat && matchFrom && matchTo;
+    const matchArchive = agArchiveFilter === 'archived' ? b.archived : !b.archived;
+    return matchCom && matchStat && matchFrom && matchTo && matchArchive;
   });
 
   const counts = {};
   commerciaux.forEach(c => { counts[c.id] = briefs.filter(b=>b.commercial===c.id).length; });
 
   $('main').innerHTML = `
-    <div class="page-title">Tableau de bord</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+      <div class="page-title">Tableau de bord</div>
+      <div style="display:flex;gap:6px">
+        <button onclick="agArchiveFilter='active';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${agArchiveFilter==='active'?'var(--sky)':'var(--gray-200)'};background:${agArchiveFilter==='active'?'var(--sky-light)':'#fff'};color:${agArchiveFilter==='active'?'var(--navy)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${agArchiveFilter==='active'?'500':'400'}">Actifs</button>
+        <button onclick="agArchiveFilter='archived';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${agArchiveFilter==='archived'?'var(--amber)':'var(--gray-200)'};background:${agArchiveFilter==='archived'?'var(--amber-light)':'#fff'};color:${agArchiveFilter==='archived'?'var(--amber)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${agArchiveFilter==='archived'?'500':'400'}">📦 Archives (${briefs.filter(b=>b.archived).length})</button>
+      </div>
+    </div>
     <div class="page-sub">Tous les briefs clients</div>
     <div class="stat-grid">
       <div class="stat"><div class="stat-n">${briefs.length}</div><div class="stat-l">Total</div></div>
@@ -785,11 +801,14 @@ function renderDetail() {
         <div class="page-sub" style="margin-bottom:0">${b.compte||''} · Déposé le ${date}</div>
       </div>
       ${isRegie ? `
-        <div style="display:flex;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <span style="font-size:12px;color:var(--gray-400)">Statut :</span>
           <select class="status-select" onchange="updateStatut('${b.id}',this.value)">
             ${STATUTS.map(s=>`<option value="${s.id}" ${b.statut===s.id?'selected':''}>${s.label}</option>`).join('')}
           </select>
+          <button onclick="toggleArchive('${b.id}',${b.archived?'true':'false'})" style="padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:500">
+            ${b.archived ? '↩ Restaurer' : '📦 Archiver'}
+          </button>
         </div>` : `<span class="badge ${st.badge}">${st.label}</span>`}
     </div>
     <div class="card">
@@ -842,6 +861,15 @@ function renderDetail() {
       </div>` : ''}
       ${b.lien_plan_media ? `<a href="${b.lien_plan_media}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--navy);font-weight:500;text-decoration:none;background:#fff;border:1px solid var(--sky);border-radius:8px;padding:8px 14px">&#8599; Ouvrir le plan média</a>` : `<div style="font-size:13px;color:var(--gray-400)">${isRegie ? 'Aucun lien renseigné pour l’instant.' : 'Plan média en cours de préparation.'}</div>`}
     </div>`;
+}
+
+async function toggleArchive(id, isArchived) {
+  const newVal = !isArchived;
+  await sb.from('briefs').update({ archived: newVal }).eq('id', id);
+  if (detailBrief && detailBrief.id === id) detailBrief.archived = newVal;
+  const b = briefs.find(b=>b.id===id);
+  if (b) b.archived = newVal;
+  go(userRole==='regie'?'agency':'client');
 }
 
 async function saveNotes(id) {
