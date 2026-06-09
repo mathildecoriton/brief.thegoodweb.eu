@@ -355,7 +355,7 @@ function renderApp() {
       <div class="topbar-nav">
         ${!isRegie ? `<button class="nav-btn ${view==='client'?'active':''}" onclick="go('client')">Mes briefs</button>` : ''}
         ${isRegie ? `<button class="nav-btn ${view==='agency'?'active':''}" onclick="go('agency')">Tableau de bord</button>` : ''}
-        <button class="nav-btn cta ${view==='form'?'active':''}" onclick="go('form')">+ Déposer un brief</button>
+        ${!isRegie ? `<button class="nav-btn cta ${view==='form'?'active':''}" onclick="go('form')">+ Déposer un brief</button>` : ''}
         <span class="nav-user">${session?.user?.email}</span>
         <button class="nav-logout" onclick="doLogout()">Déconnexion</button>
       </div>
