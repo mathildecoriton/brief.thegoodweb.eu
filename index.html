@@ -609,6 +609,24 @@ async function submitBrief() {
     created_at: new Date().toISOString(),
   }]);
   if (error) { console.error(error); if (btn) { btn.disabled = false; btn.textContent = 'Envoyer le brief'; } return; }
+  // Send notifications
+  const comEmails = { jerome: 'jerome@thegoodweb.eu', mathilde: 'mathilde@thegoodweb.eu', leslie: 'leslie@thegoodweb.eu' };
+  const briefData = {
+    compte: fd.compte, campagne: fd.camp, objectif: fd.obj, budget: fd.budget,
+    debut: fd.deb, fin: fd.fin, geo: fd.geo, email_contact: fd.email,
+    commercial: fd.commercial
+  };
+  fetch('/api/notify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'new_brief',
+      brief: briefData,
+      commercialEmail: comEmails[fd.commercial] || null,
+      clientEmail: fd.email || null
+    })
+  }).catch(() => {});
+
   formStep = formSteps.length;
   renderMain();
 }
@@ -890,7 +908,16 @@ async function updateStatut(id, newStatut) {
   await sb.from('briefs').update({ statut: newStatut }).eq('id', id);
   if (detailBrief && detailBrief.id === id) detailBrief.statut = newStatut;
   const b = briefs.find(b=>b.id===id);
-  if (b) b.statut = newStatut;
+  if (b) {
+    b.statut = newStatut;
+    if (b.email_contact) {
+      fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'status_change', brief: b, clientEmail: b.email_contact })
+      }).catch(() => {});
+    }
+  }
 }
 
 // ─── HELPERS ───
