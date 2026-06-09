@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page introuvable — The Good Web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#001858;--sky:#79BEFF;--sky-light:#E8F4FF;--orange:#F3562D}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--navy)}
+.wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center}
+.logo{display:flex;flex-direction:column;align-items:center;margin-bottom:48px;gap:2px}
+.logo-main{font-size:18px;font-weight:700;color:#fff;letter-spacing:.06em}
+.logo-sub{font-size:9px;color:var(--sky);letter-spacing:.14em}
+.number{font-size:120px;font-weight:700;color:var(--sky);line-height:1;margin-bottom:8px;opacity:.15}
+.title{font-size:24px;font-weight:500;color:#fff;margin-bottom:12px}
+.sub{font-size:15px;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:36px;max-width:380px}
+.btn{display:inline-block;background:var(--sky);color:var(--navy);font-size:14px;font-weight:500;padding:12px 28px;border-radius:100px;text-decoration:none;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.divider{width:40px;height:2px;background:rgba(121,190,255,.2);border-radius:2px;margin:40px auto}
+.contact{font-size:13px;color:rgba(255,255,255,.3)}
+.contact a{color:var(--sky);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <span class="logo-main">THE GOOD WEB</span>
+    <span class="logo-sub">· THE GOOD AUDIENCE</span>
+  </div>
+  <div class="number">404</div>
+  <div class="title">Page introuvable</div>
+  <div class="sub">Cette page n'existe pas ou a été déplacée. Revenez à l'accueil pour déposer ou consulter vos briefs.</div>
+  <a href="/" class="btn">Retour à l'accueil</a>
+  <div class="divider"></div>
+  <div class="contact">Une question ? <a href="mailto:contact@thegoodweb.eu">contact@thegoodweb.eu</a></div>
+</div>
+</body>
+</html>
