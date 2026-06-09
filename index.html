@@ -255,8 +255,8 @@ function renderAuth() {
         <div id="auth-error" class="auth-error"></div>
         ${userRole === null && authMode === 'login' ? `
           <div class="auth-tabs">
-            <button class="auth-tab ${authMode==='login'?'on':''}" onclick="authMode='login';renderAuth()">Connexion</button>
-            <button class="auth-tab ${authMode==='signup'?'on':''}" onclick="authMode='signup';renderAuth()">Créer un compte</button>
+            <button class="auth-tab ${authMode==='login'?'on':''}" onclick="setAuthMode('login')">Connexion</button>
+            <button class="auth-tab ${authMode==='signup'?'on':''}" onclick="setAuthMode('signup')">Créer un compte</button>
           </div>
         ` : ''}
         ${authMode === 'login' ? renderLoginForm() : renderSignupForm()}
@@ -281,12 +281,12 @@ function renderLoginForm() {
 function renderSignupForm() {
   return `
     <div class="auth-title">Créer un compte</div>
-    <div class="auth-sub">Accès client The Good Web</div>
+    <div class="auth-sub">Acces client The Good Web</div>
     <div class="field"><label>Nom de l'entreprise</label><input id="auth-company" type="text" placeholder="Votre entreprise"></div>
     <div class="field"><label>Email</label><input id="auth-email" type="email" placeholder="votre@email.com"></div>
-    <div class="field"><label>Mot de passe</label><input id="auth-pwd" type="password" placeholder="8 caractères minimum"></div>
+    <div class="field"><label>Mot de passe</label><input id="auth-pwd" type="password" placeholder="8 caracteres minimum"></div>
     <button class="btn-primary" onclick="doSignup()">Créer mon compte</button>
-    <div style="text-align:center;margin-top:14px"><button style="background:none;border:none;font-size:12px;color:var(--gray-400);cursor:pointer;font-family:var(--font)" onclick="authMode='login';renderAuth()">Déjà un compte ? Se connecter</button></div>`;
+    <div style="text-align:center;margin-top:14px"><button style="background:none;border:none;font-size:12px;color:var(--gray-400);cursor:pointer;font-family:var(--font)" onclick="setAuthMode('login')">Vous avez un compte ? Se connecter</button></div>`;
 }
 
 async function doLogin() {
@@ -387,7 +387,7 @@ function renderForm() {
       </div>
       <div class="grid2" style="margin-top:4px">
         <div class="field"><label>Budget</label><input id="f-budget" placeholder="Ex : 5 000 €" value="${fd.budget||''}"></div>
-        <div class="field"><label>Email de contact</label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||'${session?.user?.email||''}'}"></div>
+        <div class="field"><label>Email de contact</label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||''}"></div>
       </div>
     </div>`;
 
@@ -700,6 +700,7 @@ function tFmt(v){if(!fd.fmts)fd.fmts=[];fd.fmts.includes(v)?fd.fmts=fd.fmts.filt
 function aUrl(){const i=$('url-inp');if(!i||!i.value.trim())return;if(!fd.urls)fd.urls=[];fd.urls.push(i.value.trim());i.value='';const t=$('url-tags');if(t)t.innerHTML=fd.urls.map(u=>`<span class="url-tag">${u}<button onclick="rUrl('${u}')">×</button></span>`).join('');}
 function rUrl(u){fd.urls=(fd.urls||[]).filter(x=>x!==u);const t=$('url-tags');if(t)t.innerHTML=fd.urls.map(v=>`<span class="url-tag">${v}<button onclick="rUrl('${v}')">×</button></span>`).join('');}
 
+function setAuthMode(m){authMode=m;renderAuth();}
 init();
 </script>
 </body>
