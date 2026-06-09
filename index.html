@@ -191,7 +191,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const commerciaux = [
   {id:'jerome',name:'Jérôme',role:'Directeur commercial',init:'JR'},
-  {id:'mathilde',name:'Mathilde',role:'Chargée de clientèle',init:'MT'},
+  {id:'mathilde',name:'Mathilde',role:'Directrice de clientèle',init:'MT'},
   {id:'leslie',name:'Leslie',role:'Chargée de clientèle',init:'LS'},
 ];
 
@@ -203,7 +203,7 @@ const STATUTS = [
   {id:'perdu',label:'Perdu',badge:'badge-perdu'},
 ];
 
-const formSteps = ['Infos client','Objectif','Ciblages','Formats','URL','Contact'];
+const formSteps = ['Infos client','Objectif','Ciblages','Formats','URL','Contact','Infos complémentaires'];
 
 let session = null;
 let userRole = null; // 'regie' | 'client'
@@ -268,11 +268,11 @@ function renderLoginForm() {
   return `
     <div class="auth-title">Bienvenue</div>
     <div class="auth-sub">Connectez-vous à votre espace</div>
-    <div class="field"><label>Email</label><input id="auth-email" type="email" placeholder="votre@email.com"></div>
+    <div class="field"><label>Email</label><input id="auth-email" type="email" placeholder="votre@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="field">
       <label>Mot de passe</label>
       <div style="position:relative">
-        <input id="auth-pwd" type="password" placeholder="••••••••" style="padding-right:40px">
+        <input id="auth-pwd" type="password" placeholder="••••••••" style="padding-right:40px" onkeydown="if(event.key==='Enter')doLogin()">
         <button onclick="togglePwd('auth-pwd',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:0;line-height:1">👁</button>
       </div>
     </div>
@@ -308,8 +308,12 @@ async function doLogin() {
   const email = $('auth-email')?.value;
   const pwd = $('auth-pwd')?.value;
   if (!email || !pwd) return showAuthError('Veuillez remplir tous les champs.');
+  const el = $('auth-error');
+  if (el) { el.style.display='none'; }
   const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
-  if (error) showAuthError('Email ou mot de passe incorrect.');
+  if (error) {
+    setTimeout(() => showAuthError('Email ou mot de passe incorrect. Veuillez réessayer.'), 50);
+  }
 }
 
 async function doSignup() {
@@ -475,6 +479,14 @@ function renderForm() {
       </div>`).join('')}
   </div>`;
 
+  if (formStep === 6) body = `<div class="card">
+    <div class="card-label">Informations complémentaires</div>
+    <div class="field">
+      <label>Informations supplémentaires <span style="font-size:11px;color:var(--gray-400)">(optionnel)</span></label>
+      <textarea id="f-infos" placeholder="Tout autre élément utile pour la campagne : contexte, contraintes, remarques particulières…" style="min-height:140px">${fd.infos||''}</textarea>
+    </div>
+  </div>`;
+
   $('main').innerHTML = `
     <div class="step-header">
       <div class="step-info">
@@ -492,12 +504,32 @@ function renderForm() {
 
 async function handleNext() {
   saveStep();
+  if (formStep === 0) {
+    if (!fd.compte || !fd.camp || !fd.email) {
+      showFormError('Veuillez remplir les champs obligatoires : Compte, Nom de campagne et Email.');
+      return;
+    }
+  }
   if (formStep === formSteps.length - 1) {
     await submitBrief();
   } else {
     formStep++;
     renderMain();
   }
+}
+
+function showFormError(msg) {
+  let el = document.getElementById('form-error');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'form-error';
+    el.style.cssText = 'background:var(--red-light);color:var(--red);font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:14px;';
+    const btnRow = document.querySelector('.btn-row');
+    if (btnRow) btnRow.parentNode.insertBefore(el, btnRow);
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { if(el) el.style.display='none'; }, 4000);
 }
 
 async function submitBrief() {
@@ -523,6 +555,7 @@ async function submitBrief() {
     url_principale: fd.urlMain,
     urls_secondaires: fd.urls ? fd.urls.join(', ') : '',
     commercial: fd.commercial,
+    infos_complementaires: fd.infos || '',
     statut: 'nouveau',
     created_at: new Date().toISOString(),
   }]);
@@ -649,7 +682,7 @@ function renderDetail() {
   const date = new Date(b.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
 
   $('main').innerHTML = `
-    <button class="btn-back-link" onclick="go(isRegie?'agency':'client')">← Retour</button>
+    <button class="btn-back-link" onclick="go(userRole==='regie'?'agency':'client')">← Retour</button>
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
       <div>
         <div class="page-title">${b.campagne||'Sans titre'}</div>
@@ -693,7 +726,8 @@ function renderDetail() {
         ${b.urls_secondaires?`<div class="detail-item" style="grid-column:span 2"><div class="detail-label">URLs secondaires</div><div class="detail-value">${b.urls_secondaires}</div></div>`:''}
       </div>
     </div>
-    ${b.kpis?`<div class="card"><div class="card-label">KPIs</div><div style="font-size:13.5px;color:var(--gray-800);line-height:1.6">${b.kpis}</div></div>`:''}`;
+    ${b.kpis?`<div class="card"><div class="card-label">KPIs</div><div style="font-size:13.5px;color:var(--gray-800);line-height:1.6">${b.kpis}</div></div>`:''}
+    ${b.infos_complementaires?`<div class="card"><div class="card-label">Informations complémentaires</div><div style="font-size:13.5px;color:var(--gray-800);line-height:1.6">${b.infos_complementaires}</div></div>`:''}`;
 }
 
 async function updateStatut(id, newStatut) {
@@ -704,12 +738,18 @@ async function updateStatut(id, newStatut) {
 }
 
 // ─── HELPERS ───
-function go(v) { view = v; renderApp(); }
+function go(v) {
+  // Save current step data before navigating
+  if (view === 'form') saveStep();
+  view = v;
+  renderApp();
+}
 function saveStep() {
   if(formStep===0){['compte','camp','deb','fin','budget','email'].forEach(k=>{const e=$('f-'+k);if(e)fd[k]=e.value});}
   if(formStep===1){const e=$('f-kpis');if(e)fd.kpis=e.value;}
   if(formStep===2){['geo','socio','fin2','moments','intent'].forEach(k=>{const e=$('f-'+k);if(e)fd[k]=e.value});}
   if(formStep===4){const e=$('f-url');if(e)fd.urlMain=e.value;}
+  if(formStep===6){const e=$('f-infos');if(e)fd.infos=e.value;}
 }
 function tFmt(v){if(!fd.fmts)fd.fmts=[];fd.fmts.includes(v)?fd.fmts=fd.fmts.filter(f=>f!==v):fd.fmts.push(v);renderMain();}
 function aUrl(){const i=$('url-inp');if(!i||!i.value.trim())return;if(!fd.urls)fd.urls=[];fd.urls.push(i.value.trim());i.value='';const t=$('url-tags');if(t)t.innerHTML=fd.urls.map(u=>`<span class="url-tag">${u}<button onclick="rUrl('${u}')">×</button></span>`).join('');}
@@ -739,7 +779,7 @@ async function doForgot() {
   const email = document.getElementById('forgot-email')?.value;
   if (!email) return;
   const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin
+    redirectTo: window.location.href
   });
   const el = document.getElementById('auth-error');
   if (el) {
