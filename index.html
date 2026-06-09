@@ -224,6 +224,18 @@ html,body{height:100%;font-family:var(--font);background:var(--gray-50);color:va
 .page-title{font-size:22px;font-weight:500;color:var(--navy);margin-bottom:4px}
 .page-sub{font-size:13.5px;color:var(--gray-400);margin-bottom:24px}
 
+/* EDIT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,24,88,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:500;color:var(--navy);margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--gray-400);margin-bottom:20px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--gray-100)}
+.field-modified-client{color:#1D6FA8;font-weight:500}
+.field-modified-regie{color:#0F4D7A;font-weight:500;font-style:italic}
+.edit-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.edit-badge-client{background:#E8F4FF;color:#1D6FA8}
+.edit-badge-regie{background:#d4e8f5;color:#0F4D7A;font-style:italic}
+
 /* LOADING */
 .loading{display:flex;align-items:center;justify-content:center;min-height:200px;color:var(--gray-400);font-size:14px}
 
@@ -816,7 +828,10 @@ function renderDetail() {
   const date = new Date(b.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
 
   $('main').innerHTML = `
-    <button class="btn-back-link" onclick="go(userRole==='regie'?'agency':'client')">← Retour</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+      <button class="btn-back-link" style="margin-bottom:0" onclick="go(userRole==='regie'?'agency':'client')">← Retour</button>
+      <button onclick="openEditModal('${b.id}')" style="background:var(--sky-light);border:1px solid var(--sky);border-radius:9px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;color:var(--navy);font-family:var(--font)">✏️ Modifier le brief</button>
+    </div>
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
       <div>
         <div class="page-title">${b.campagne||'Sans titre'}</div>
@@ -836,10 +851,10 @@ function renderDetail() {
     <div class="card">
       <div class="card-label">Informations générales</div>
       <div class="detail-grid">
-        <div class="detail-item"><div class="detail-label">Compte</div><div class="detail-value">${b.compte||'—'}</div></div>
-        <div class="detail-item"><div class="detail-label">Objectif</div><div class="detail-value">${b.objectif||'—'}</div></div>
-        <div class="detail-item"><div class="detail-label">Période</div><div class="detail-value">${(b.debut && b.fin) ? b.debut + ' → ' + b.fin : 'Non renseignée'}</div></div>
-        <div class="detail-item"><div class="detail-label">Budget</div><div class="detail-value">${b.budget||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Compte</div><div class="detail-value ${getEditClass(b,'compte')}">${b.compte||'—'}${getEditBadge(b,'compte')}</div></div>
+        <div class="detail-item"><div class="detail-label">Objectif</div><div class="detail-value ${getEditClass(b,'objectif')}">${b.objectif||'—'}${getEditBadge(b,'objectif')}</div></div>
+        <div class="detail-item"><div class="detail-label">Période</div><div class="detail-value ${getEditClass(b,'debut')}">${(b.debut && b.fin) ? b.debut + ' → ' + b.fin : 'Non renseignée'}${getEditBadge(b,'debut')}</div></div>
+        <div class="detail-item"><div class="detail-label">Budget</div><div class="detail-value ${getEditClass(b,'budget')}">${b.budget||'—'}${getEditBadge(b,'budget')}</div></div>
         <div class="detail-item"><div class="detail-label">Contact</div><div class="detail-value">${b.contact_name ? b.contact_name + '<br>' : ''}${b.email_contact||'—'}</div></div>
         <div class="detail-item"><div class="detail-label">Commercial</div><div class="detail-value">${com?.name||'—'}</div></div>
       </div>
@@ -1053,6 +1068,181 @@ function togglePwd(id, btn) {
     input.type = 'password';
     btn.textContent = '👁';
   }
+}
+
+// ─── EDIT MODAL ───
+function getEditClass(b, field) {
+  if (!b.edits) return '';
+  const edit = b.edits.find(e => e.field_name === field);
+  if (!edit) return '';
+  return edit.edited_by === 'regie' ? 'field-modified-regie' : 'field-modified-client';
+}
+
+function getEditBadge(b, field) {
+  if (!b.edits) return '';
+  const edit = b.edits.find(e => e.field_name === field);
+  if (!edit) return '';
+  const label = edit.edited_by === 'regie' ? 'modifié par l\'équipe' : 'modifié par le client';
+  const cls = edit.edited_by === 'regie' ? 'edit-badge-regie' : 'edit-badge-client';
+  return `<span class="edit-badge ${cls}">${label}</span>`;
+}
+
+async function openEditModal(id) {
+  const b = detailBrief || briefs.find(b => b.id === id);
+  if (!b) return;
+  const isReg = userRole === 'regie';
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'edit-modal';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-title">Modifier le brief</div>
+      <div class="modal-sub">${b.compte||''} — ${b.campagne||''}</div>
+      <div class="field"><label>Compte</label><input id="em-compte" value="${(b.compte||'').replace(/"/g,'&quot;')}"></div>
+      <div class="field"><label>Nom de campagne</label><input id="em-camp" value="${(b.campagne||'').replace(/"/g,'&quot;')}"></div>
+      <div class="grid2">
+        <div class="field"><label>Début</label><input id="em-deb" type="date" value="${b.debut||''}"></div>
+        <div class="field"><label>Fin</label><input id="em-fin" type="date" value="${b.fin||''}"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Budget</label><input id="em-budget" value="${(b.budget||'').replace(/"/g,'&quot;')}"></div>
+        <div class="field"><label>Objectif</label>
+          <select id="em-obj">
+            ${['Notoriété','Acquisition','Fidélisation','Lancement produit','Autre'].map(o => `<option value="${o}" ${b.objectif===o?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Ciblage géographique</label><input id="em-geo" value="${(b.geo||'').replace(/"/g,'&quot;')}"></div>
+      <div class="field"><label>Ciblage sociodémographique</label><textarea id="em-socio">${b.socio||''}</textarea></div>
+      ${isReg ? `
+      <div class="field"><label>Signaux financiers</label><textarea id="em-fin2">${b.signaux_financiers||''}</textarea></div>
+      <div class="field"><label>Moments de vie</label><textarea id="em-moments">${b.moments_vie||''}</textarea></div>
+      <div class="field"><label>Intentions d'achat</label><textarea id="em-intent">${b.intentions||''}</textarea></div>
+      <div class="field"><label>URL principale</label><input id="em-url" type="url" value="${(b.url_principale||'').replace(/"/g,'&quot;')}"></div>
+      <div class="field"><label>Informations complémentaires</label><textarea id="em-infos">${b.infos_complementaires||''}</textarea></div>
+      ` : ''}
+      <div class="modal-footer">
+        <button class="btn-back" onclick="document.getElementById('edit-modal').remove()">Annuler</button>
+        <button class="btn-next" onclick="saveEditModal('${id}')">Enregistrer les modifications</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+async function saveEditModal(id) {
+  const b = detailBrief || briefs.find(b => b.id === id);
+  if (!b) return;
+  const isReg = userRole === 'regie';
+  const editedBy = isReg ? 'regie' : 'client';
+  const now = new Date().toISOString();
+
+  const fields = [
+    {key:'compte', el:'em-compte', col:'compte'},
+    {key:'camp', el:'em-camp', col:'campagne'},
+    {key:'deb', el:'em-deb', col:'debut'},
+    {key:'fin', el:'em-fin', col:'fin'},
+    {key:'budget', el:'em-budget', col:'budget'},
+    {key:'obj', el:'em-obj', col:'objectif'},
+    {key:'geo', el:'em-geo', col:'geo'},
+    {key:'socio', el:'em-socio', col:'socio'},
+  ];
+
+  if (isReg) {
+    fields.push(
+      {key:'fin2', el:'em-fin2', col:'signaux_financiers'},
+      {key:'moments', el:'em-moments', col:'moments_vie'},
+      {key:'intent', el:'em-intent', col:'intentions'},
+      {key:'url', el:'em-url', col:'url_principale'},
+      {key:'infos', el:'em-infos', col:'infos_complementaires'}
+    );
+  }
+
+  const updates = {};
+  const editRecords = [];
+
+  fields.forEach(f => {
+    const el = document.getElementById(f.el);
+    if (!el) return;
+    const newVal = el.value;
+    const oldVal = b[f.col] || '';
+    if (newVal !== oldVal) {
+      updates[f.col] = newVal;
+      editRecords.push({ brief_id: id, field_name: f.col, old_value: oldVal, new_value: newVal, edited_by: editedBy, edited_at: now });
+    }
+  });
+
+  if (Object.keys(updates).length === 0) {
+    document.getElementById('edit-modal')?.remove();
+    return;
+  }
+
+  // Save to briefs table
+  await sb.from('briefs').update(updates).eq('id', id);
+
+  // Save edit records
+  if (editRecords.length > 0) {
+    await sb.from('brief_edits').insert(editRecords);
+  }
+
+  // Update local state
+  Object.assign(b, updates);
+  if (detailBrief && detailBrief.id === id) Object.assign(detailBrief, updates);
+
+  // Send notification
+  const com = commerciaux.find(c => c.id === b.commercial);
+  const comEmails = { jerome: 'jerome@thegoodweb.eu', mathilde: 'mathilde@thegoodweb.eu', leslie: 'leslie@thegoodweb.eu' };
+  if (editedBy === 'client' && com) {
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'brief_edited', brief: b, by: 'client', commercialEmail: comEmails[b.commercial], clientEmail: null })
+    }).catch(() => {});
+  } else if (editedBy === 'regie' && b.email_contact) {
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'brief_edited', brief: b, by: 'regie', commercialEmail: null, clientEmail: b.email_contact })
+    }).catch(() => {});
+  }
+
+  document.getElementById('edit-modal')?.remove();
+
+  // Show toast
+  let toast = document.getElementById('archive-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'archive-toast';
+    toast.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:13px;padding:12px 20px;border-radius:10px;z-index:999;max-width:320px;text-align:center;line-height:1.5;transition:opacity .3s';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = 'Brief modifié avec succès.';
+  toast.style.opacity = '1';
+  toast.style.display = 'block';
+  clearTimeout(window._archiveToastTimer);
+  window._archiveToastTimer = setTimeout(() => { toast.style.opacity='0'; setTimeout(()=>{toast.style.display='none';},300); }, 2500);
+
+  // Reload edits and re-render
+  await loadBriefEdits(id);
+  renderMain();
+}
+
+async function loadBriefEdits(id) {
+  const { data } = await sb.from('brief_edits').select('*').eq('brief_id', id);
+  const b = detailBrief || briefs.find(b => b.id === id);
+  if (b && data) b.edits = data;
+}
+
+const _origOpenDetail = openDetail;
+async function openDetail(id) {
+  detailBrief = briefs.find(b => b.id === id) || null;
+  if (!detailBrief) {
+    const { data } = await sb.from('briefs').select('*').eq('id', id).single();
+    detailBrief = data;
+  }
+  if (detailBrief) await loadBriefEdits(id);
+  view = 'detail';
+  renderMain();
 }
 
 function setAuthMode(m){authMode=m;renderAuth();}
