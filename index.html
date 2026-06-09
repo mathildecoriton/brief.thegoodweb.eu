@@ -453,8 +453,9 @@ function renderForm() {
       </div>
       <div class="grid2" style="margin-top:4px">
         <div class="field"><label>Budget</label><input id="f-budget" placeholder="Ex : 5 000 €" value="${fd.budget||''}"></div>
-        <div class="field"><label>Email de contact</label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||''}"></div>
+        <div class="field"><label>Nom du contact <span style="font-size:11px;color:var(--gray-400)">(optionnel)</span></label><input id="f-contact-name" placeholder="Prénom Nom" value="${fd.contactName||''}"></div>
       </div>
+      <div class="field" style="margin-top:4px"><label>Email de contact</label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||''}"></div>
     </div>`;
 
   if (formStep === 1) {
@@ -590,6 +591,7 @@ async function submitBrief() {
     fin: fd.fin,
     budget: fd.budget,
     email_contact: fd.email,
+    contact_name: fd.contactName || '',
     objectif: fd.obj,
     kpis: fd.kpis,
     geo: fd.geo,
@@ -614,7 +616,7 @@ async function submitBrief() {
   const briefData = {
     compte: fd.compte, campagne: fd.camp, objectif: fd.obj, budget: fd.budget,
     debut: fd.deb, fin: fd.fin, geo: fd.geo, email_contact: fd.email,
-    commercial: fd.commercial
+    commercial: fd.commercial, contact_name: fd.contactName || ''
   };
   fetch('/api/notify', {
     method: 'POST',
@@ -650,7 +652,12 @@ async function renderClient() {
     </div>
     <div class="card">
       <div class="card-label">Mes campagnes</div>
-      ${briefs.length === 0 ? `<div style="font-size:13px;color:var(--gray-400);padding:16px 0;text-align:center">Aucun brief déposé pour l'instant.</div>` :
+      ${briefs.length === 0 ? `<div style="text-align:center;padding:24px 16px">
+        <div style="font-size:32px;margin-bottom:12px">👋</div>
+        <div style="font-size:15px;font-weight:500;color:var(--navy);margin-bottom:6px">Bienvenue sur votre espace !</div>
+        <div style="font-size:13px;color:var(--gray-400);margin-bottom:20px;line-height:1.6">Déposez votre premier brief et notre équipe<br>vous recontactera sous 48h.</div>
+        <button class="btn-next" onclick="go('form')" style="margin:0 auto">+ Déposer mon premier brief</button>
+      </div>` :
         briefs.map(b => {
           const st = STATUTS.find(s=>s.id===b.statut) || STATUTS[0];
           const init = (b.compte||'?').substring(0,2).toUpperCase();
@@ -789,9 +796,9 @@ function renderDetail() {
       <div class="detail-grid">
         <div class="detail-item"><div class="detail-label">Compte</div><div class="detail-value">${b.compte||'—'}</div></div>
         <div class="detail-item"><div class="detail-label">Objectif</div><div class="detail-value">${b.objectif||'—'}</div></div>
-        <div class="detail-item"><div class="detail-label">Période</div><div class="detail-value">${b.debut||'—'} → ${b.fin||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Période</div><div class="detail-value">${(b.debut && b.fin) ? b.debut + ' → ' + b.fin : 'Non renseignée'}</div></div>
         <div class="detail-item"><div class="detail-label">Budget</div><div class="detail-value">${b.budget||'—'}</div></div>
-        <div class="detail-item"><div class="detail-label">Contact</div><div class="detail-value">${b.email_contact||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Contact</div><div class="detail-value">${b.contact_name ? b.contact_name + '<br>' : ''}${b.email_contact||'—'}</div></div>
         <div class="detail-item"><div class="detail-label">Commercial</div><div class="detail-value">${com?.name||'—'}</div></div>
       </div>
     </div>
