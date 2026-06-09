@@ -183,7 +183,12 @@ html,body{height:100%;font-family:var(--font);background:var(--gray-50);color:va
 .badge-perdu{background:var(--red-light);color:var(--red)}
 
 /* STATUS SELECT */
-.status-select{font-size:12px;border:1px solid var(--gray-200);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:var(--font);background:#fff;outline:none}
+.status-select{font-size:12px;border:1px solid var(--gray-200);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:var(--font);background:#fff;outline:none;font-weight:500}
+.status-select.badge-nouveau{background:var(--sky-light);color:var(--navy);border-color:var(--sky-mid)}
+.status-select.badge-traitement{background:var(--amber-light);color:var(--amber);border-color:#fcd34d}
+.status-select.badge-attente{background:var(--purple-light);color:var(--purple);border-color:#c4b5fd}
+.status-select.badge-gagne{background:var(--green-light);color:var(--green);border-color:#86efac}
+.status-select.badge-perdu{background:var(--red-light);color:var(--red);border-color:#fca5a5}
 
 /* FILTERS */
 .filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
@@ -250,6 +255,8 @@ let view = 'form';
 let formStep = 0;
 let agFilter = 'all';
 let statFilter = 'all';
+let dateFrom = '';
+let dateTo = '';
 let fd = {};
 let briefs = [];
 let detailBrief = null;
@@ -649,7 +656,10 @@ async function renderAgency() {
   const filtered = briefs.filter(b => {
     const matchCom = agFilter === 'all' || b.commercial === agFilter;
     const matchStat = statFilter === 'all' || b.statut === statFilter;
-    return matchCom && matchStat;
+    const bDate = b.created_at ? b.created_at.substring(0,10) : '';
+    const matchFrom = !dateFrom || bDate >= dateFrom;
+    const matchTo = !dateTo || bDate <= dateTo;
+    return matchCom && matchStat && matchFrom && matchTo;
   });
 
   const counts = {};
@@ -680,6 +690,20 @@ async function renderAgency() {
           ${STATUTS.map(s=>`<button class="filter-btn ${statFilter===s.id?'on':''}" onclick="statFilter='${s.id}';renderMain()">${s.label}</button>`).join('')}
         </div>
       </div>
+      <div style="margin-top:12px">
+        <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.06em">Période de réception</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px">
+            <label style="font-size:12px;color:var(--gray-400)">Du</label>
+            <input type="date" id="filter-from" value="${dateFrom}" onchange="dateFrom=this.value;renderMain()" style="font-size:12px;border:1px solid var(--gray-200);border-radius:8px;padding:5px 8px;background:#fff;color:var(--gray-800);outline:none;font-family:var(--font)">
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <label style="font-size:12px;color:var(--gray-400)">Au</label>
+            <input type="date" id="filter-to" value="${dateTo}" onchange="dateTo=this.value;renderMain()" style="font-size:12px;border:1px solid var(--gray-200);border-radius:8px;padding:5px 8px;background:#fff;color:var(--gray-800);outline:none;font-family:var(--font)">
+          </div>
+          ${(dateFrom||dateTo)?`<button onclick="dateFrom='';dateTo='';renderMain()" style="font-size:12px;color:var(--gray-400);border:none;background:none;cursor:pointer;font-family:var(--font);text-decoration:underline">Réinitialiser</button>`:''}
+        </div>
+      </div>
     </div>
     <div class="card">
       <div class="card-label">Briefs (${filtered.length})</div>
@@ -689,13 +713,15 @@ async function renderAgency() {
           const com = commerciaux.find(c=>c.id===b.commercial);
           const init = (b.compte||'?').substring(0,2).toUpperCase();
           const date = new Date(b.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
-          return `<div class="brief-row" onclick="openDetail('${b.id}')">
-            <div class="b-avatar">${init}</div>
-            <div class="b-info">
+          return `<div class="brief-row">
+            <div class="b-avatar" onclick="openDetail('${b.id}')" style="cursor:pointer">${init}</div>
+            <div class="b-info" onclick="openDetail('${b.id}')" style="cursor:pointer">
               <div class="b-name">${b.compte||'?'} — ${b.campagne||'Sans titre'}</div>
               <div class="b-meta">${b.objectif||''} · ${date}${com?' · <span style="color:var(--sky)">'+com.name+'</span>':''}</div>
             </div>
-            <span class="badge ${st.badge}">${st.label}</span>
+            <select class="status-select ${st.badge}" onchange="updateStatutInline('${b.id}',this.value,this)" onclick="event.stopPropagation()">
+              ${STATUTS.map(s=>`<option value="${s.id}" ${b.statut===s.id?'selected':''}>${s.label}</option>`).join('')}
+            </select>
           </div>`;
         }).join('')}
     </div>`;
@@ -767,6 +793,18 @@ function renderDetail() {
     </div>
     ${b.kpis?`<div class="card"><div class="card-label">KPIs</div><div style="font-size:13.5px;color:var(--gray-800);line-height:1.6">${b.kpis}</div></div>`:''}
     ${b.infos_complementaires?`<div class="card"><div class="card-label">Informations complémentaires</div><div style="font-size:13.5px;color:var(--gray-800);line-height:1.6">${b.infos_complementaires}</div></div>`:''}`;
+}
+
+async function updateStatutInline(id, newStatut, selectEl) {
+  await sb.from('briefs').update({ statut: newStatut }).eq('id', id);
+  const b = briefs.find(b=>b.id===id);
+  if (b) b.statut = newStatut;
+  // Update select color class
+  const st = STATUTS.find(s=>s.id===newStatut);
+  if (st && selectEl) {
+    STATUTS.forEach(s => selectEl.classList.remove(s.badge));
+    selectEl.classList.add(st.badge);
+  }
 }
 
 async function updateStatut(id, newStatut) {
