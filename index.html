@@ -672,13 +672,16 @@ async function renderClient() {
           const st = STATUTS.find(s=>s.id===b.statut) || STATUTS[0];
           const init = (b.compte||'?').substring(0,2).toUpperCase();
           const date = new Date(b.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
-          return `<div class="brief-row" onclick="openDetail('${b.id}')">
-            <div class="b-avatar">${init}</div>
-            <div class="b-info">
+          return `<div class="brief-row">
+            <div class="b-avatar" onclick="openDetail('${b.id}')" style="cursor:pointer">${init}</div>
+            <div class="b-info" onclick="openDetail('${b.id}')" style="cursor:pointer">
               <div class="b-name">${b.campagne||'Sans titre'}</div>
               <div class="b-meta">${b.objectif||''} · ${date}</div>
             </div>
-            <span class="badge ${st.badge}">${st.label}</span>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+              <span class="badge ${st.badge}">${st.label}</span>
+              <button onclick="event.stopPropagation();toggleArchive('${b.id}',${b.archived?'true':'false'})" title="${b.archived?'Restaurer':'Archiver'}" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0">${b.archived?'↩':'📦'}</button>
+            </div>
           </div>`;
         }).join('')}
     </div>
@@ -765,9 +768,12 @@ async function renderAgency() {
               <div class="b-name">${b.compte||'?'} — ${b.campagne||'Sans titre'}</div>
               <div class="b-meta">${b.objectif||''} · ${date}${com?' · <span style="color:var(--sky)">'+com.name+'</span>':''}</div>
             </div>
-            <select class="status-select ${st.badge}" onchange="updateStatutInline('${b.id}',this.value,this)" onclick="event.stopPropagation()">
-              ${STATUTS.map(s=>`<option value="${s.id}" ${b.statut===s.id?'selected':''}>${s.label}</option>`).join('')}
-            </select>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+              <select class="status-select ${st.badge}" onchange="updateStatutInline('${b.id}',this.value,this)" onclick="event.stopPropagation()">
+                ${STATUTS.map(s=>`<option value="${s.id}" ${b.statut===s.id?'selected':''}>${s.label}</option>`).join('')}
+              </select>
+              <button onclick="event.stopPropagation();toggleArchive('${b.id}',${b.archived?'true':'false'})" title="${b.archived?'Restaurer':'Archiver'}" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0">${b.archived?'↩':'📦'}</button>
+            </div>
           </div>`;
         }).join('')}
     </div>
