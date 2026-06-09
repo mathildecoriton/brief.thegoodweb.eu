@@ -444,8 +444,8 @@ function renderForm() {
     <div class="card">
       <div class="card-label">Informations client</div>
       <div class="grid2">
-        <div class="field"><label>Compte</label><input id="f-compte" placeholder="Nom du client" value="${fd.compte||''}"></div>
-        <div class="field"><label>Nom de campagne</label><input id="f-camp" placeholder="Ex : Rentrée 2025" value="${fd.camp||''}"></div>
+        <div class="field"><label>Compte <span style="color:var(--orange)">*</span></label><input id="f-compte" placeholder="Nom du client" value="${fd.compte||''}"></div>
+        <div class="field"><label>Nom de campagne <span style="color:var(--orange)">*</span></label><input id="f-camp" placeholder="Ex : Rentrée 2025" value="${fd.camp||''}"></div>
       </div>
       <div class="grid2" style="margin-top:4px">
         <div class="field"><label>Début de campagne</label><input id="f-deb" type="date" value="${fd.deb||''}"></div>
@@ -455,7 +455,7 @@ function renderForm() {
         <div class="field"><label>Budget</label><input id="f-budget" placeholder="Ex : 5 000 €" value="${fd.budget||''}"></div>
         <div class="field"><label>Nom du contact <span style="font-size:11px;color:var(--gray-400)">(optionnel)</span></label><input id="f-contact-name" placeholder="Prénom Nom" value="${fd.contactName||''}"></div>
       </div>
-      <div class="field" style="margin-top:4px"><label>Email de contact</label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||''}"></div>
+      <div class="field" style="margin-top:4px"><label>Email de contact <span style="color:var(--orange)">*</span></label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||''}"></div>
     </div>`;
 
   if (formStep === 1) {
@@ -544,6 +544,7 @@ function renderForm() {
       <div class="progress">${dots}</div>
     </div>
     ${body}
+    ${formStep===0 ? `<div style="font-size:12px;color:var(--gray-400);margin-top:4px"><span style="color:var(--orange)">*</span> Champs obligatoires</div>` : ''}
     <div class="btn-row">
       ${formStep>0?`<button class="btn-back" onclick="saveStep();formStep--;renderMain()">← Retour</button>`:`<span></span>`}
       <button class="btn-next" onclick="handleNext()">${formStep===formSteps.length-1?'Envoyer le brief':'Suivant →'}</button>
