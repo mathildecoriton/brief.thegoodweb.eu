@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#001858">
+<meta name="description" content="Déposez vos briefs publicitaires · The Good Web">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23001858'/><text x='50%25' y='55%25' text-anchor='middle' dominant-baseline='middle' font-size='18' font-family='sans-serif' font-weight='700' fill='%2379BEFF'>G</text></svg>">
 <title>brief.thegoodweb.eu</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -61,8 +64,10 @@ html,body{height:100%;font-family:var(--font);background:var(--gray-50);color:va
   .btn-row .btn-back,.btn-row .btn-next{width:100%;text-align:center;justify-content:center}
   .filter-bar{gap:5px}
   .filter-btn{font-size:11px;padding:4px 10px}
-  .brief-row{flex-wrap:wrap;gap:8px}
+  .brief-row{flex-wrap:nowrap;gap:6px;align-items:center}
   .brief-row:hover{margin:0;padding:11px 0}
+  .brief-row .b-info{min-width:0;flex:1}
+  .brief-row select{max-width:110px;font-size:11px;padding:3px 4px}
   .page-title{font-size:18px}
   .com-card{padding:10px 12px}
   .chips{gap:5px}
@@ -73,6 +78,12 @@ html,body{height:100%;font-family:var(--font);background:var(--gray-50);color:va
   .url-add{flex-direction:column}
   .url-add button{padding:9px;border-radius:9px}
   .topbar-nav .nav-user{display:none}
+  .archive-tab-row{flex-direction:column;align-items:flex-start;gap:8px}
+  .filter-section{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+  .stat-grid{gap:6px}
+  .stat-n{font-size:20px}
+  .detail-grid{gap:8px}
+  .status-select{max-width:120px;font-size:11px}
 }
 
 /* MAIN */
@@ -259,6 +270,7 @@ let agArchiveFilter = 'active';
 let clientArchiveFilter = 'active';
 let dateFrom = '';
 let dateTo = '';
+let agSearch = '';
 let fd = {};
 let briefs = [];
 let nouveauxCount = 0;
@@ -647,7 +659,7 @@ async function renderClient() {
   const gagnes = activeBriefs.filter(b => b.statut === 'gagne').length;
 
   $('main').innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+    <div class="archive-tab-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
       <div class="page-title">Mes briefs</div>
       <div style="display:flex;gap:6px">
         <button onclick="clientArchiveFilter='active';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${clientArchiveFilter==='active'?'var(--sky)':'var(--gray-200)'};background:${clientArchiveFilter==='active'?'var(--sky-light)':'#fff'};color:${clientArchiveFilter==='active'?'var(--navy)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${clientArchiveFilter==='active'?'500':'400'}">Actifs</button>
@@ -702,14 +714,15 @@ async function renderAgency() {
     const matchFrom = !dateFrom || bDate >= dateFrom;
     const matchTo = !dateTo || bDate <= dateTo;
     const matchArchive = agArchiveFilter === 'archived' ? b.archived : !b.archived;
-    return matchCom && matchStat && matchFrom && matchTo && matchArchive;
+    const matchSearch = !agSearch || (b.compte||'').toLowerCase().includes(agSearch.toLowerCase()) || (b.campagne||'').toLowerCase().includes(agSearch.toLowerCase());
+    return matchCom && matchStat && matchFrom && matchTo && matchArchive && matchSearch;
   });
 
   const counts = {};
   commerciaux.forEach(c => { counts[c.id] = briefs.filter(b=>b.commercial===c.id).length; });
 
   $('main').innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+    <div class="archive-tab-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
       <div class="page-title">Tableau de bord</div>
       <div style="display:flex;gap:6px">
         <button onclick="agArchiveFilter='active';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${agArchiveFilter==='active'?'var(--sky)':'var(--gray-200)'};background:${agArchiveFilter==='active'?'var(--sky-light)':'#fff'};color:${agArchiveFilter==='active'?'var(--navy)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${agArchiveFilter==='active'?'500':'400'}">Actifs</button>
@@ -725,6 +738,9 @@ async function renderAgency() {
     </div>
     <div class="card">
       <div class="card-label">Filtres</div>
+      <div class="field" style="margin-bottom:14px">
+        <input id="agency-search" type="text" placeholder="Rechercher un client, une campagne…" value="${agSearch||''}" oninput="agSearch=this.value;renderMain()" style="font-size:13.5px;border:1px solid var(--gray-200);border-radius:9px;padding:9px 12px;width:100%;background:#fff;color:var(--gray-800);outline:none;font-family:var(--font)">
+      </div>
       <div style="margin-bottom:10px">
         <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.06em">Commercial</div>
         <div class="filter-bar">
@@ -891,6 +907,21 @@ async function toggleArchive(id, isArchived) {
   if (detailBrief && detailBrief.id === id) detailBrief.archived = newVal;
   const b = briefs.find(b => b.id === id);
   if (b) b.archived = newVal;
+  // Show confirmation toast
+  const msg = newVal ? 'Brief archivé avec succès.' : 'Brief restauré avec succès.';
+  let toast = document.getElementById('archive-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'archive-toast';
+    toast.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:13px;padding:12px 20px;border-radius:10px;z-index:999;max-width:320px;text-align:center;line-height:1.5;transition:opacity .3s';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = msg;
+  toast.style.opacity = '1';
+  toast.style.display = 'block';
+  clearTimeout(window._archiveToastTimer);
+  window._archiveToastTimer = setTimeout(() => { toast.style.opacity='0'; setTimeout(()=>{toast.style.display='none';},300); }, 2500);
+
   if (view === 'detail') {
     renderMain();
   } else if (userRole === 'regie') {
