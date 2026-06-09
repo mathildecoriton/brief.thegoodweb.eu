@@ -680,7 +680,7 @@ async function renderClient() {
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
               <span class="badge ${st.badge}">${st.label}</span>
-              <button onclick="event.stopPropagation();toggleArchive('${b.id}',${b.archived?'true':'false'})" title="${b.archived?'Restaurer':'Archiver'}" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0">${b.archived?'↩':'📦'}</button>
+              <button onclick="event.stopPropagation();toggleArchive('${b.id}',${b.archived?'true':'false'})" title="${b.archived?'Restaurer':'Archiver'}" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0">${b.archived?'↩':'🗑️'}</button>
             </div>
           </div>`;
         }).join('')}
@@ -772,7 +772,7 @@ async function renderAgency() {
               <select class="status-select ${st.badge}" onchange="updateStatutInline('${b.id}',this.value,this)" onclick="event.stopPropagation()">
                 ${STATUTS.map(s=>`<option value="${s.id}" ${b.statut===s.id?'selected':''}>${s.label}</option>`).join('')}
               </select>
-              <button onclick="event.stopPropagation();toggleArchive('${b.id}',${b.archived?'true':'false'})" title="${b.archived?'Restaurer':'Archiver'}" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0">${b.archived?'↩':'📦'}</button>
+              <button onclick="event.stopPropagation();toggleArchive('${b.id}',${b.archived?'true':'false'})" title="${b.archived?'Restaurer':'Archiver'}" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0">${b.archived?'↩':'🗑️'}</button>
             </div>
           </div>`;
         }).join('')}
@@ -875,7 +875,13 @@ async function toggleArchive(id, isArchived) {
   if (detailBrief && detailBrief.id === id) detailBrief.archived = newVal;
   const b = briefs.find(b=>b.id===id);
   if (b) b.archived = newVal;
-  go(userRole==='regie'?'agency':'client');
+  // Stay on current view and re-render
+  if (view === 'detail') {
+    renderMain();
+  } else {
+    if (userRole === 'regie') await renderAgency();
+    else await renderClient();
+  }
 }
 
 async function saveNotes(id) {
