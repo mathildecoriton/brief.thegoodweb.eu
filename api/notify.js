@@ -81,6 +81,41 @@ export default async function handler(req, res) {
     }
   }
 
+  if (type === 'brief_edited') {
+    const editedByLabel = brief.by === 'regie' ? "L'équipe The Good Web" : "Votre client";
+    const recipient = brief.by === 'client' ? commercialEmail : clientEmail;
+    const recipientLabel = brief.by === 'client' ? 'le commercial' : 'le client';
+    if (recipient) {
+      const subjectLine = brief.by === 'client'
+        ? `Brief modifié par le client — ${brief.compte} · ${brief.campagne}`
+        : `Votre brief a été mis à jour — ${brief.campagne}`;
+      const bodyText = brief.by === 'client'
+        ? `<strong>${brief.compte}</strong> vient de modifier son brief <strong>${brief.campagne}</strong>. Connectez-vous pour consulter les changements.`
+        : `Votre brief <strong>${brief.campagne}</strong> a été mis à jour par votre commercial. Connectez-vous pour consulter les modifications.`;
+      emails.push({
+        from: 'The Good Web <noreply@thegoodweb.eu>',
+        to: recipient,
+        subject: subjectLine,
+        html: `
+          <div style="font-family:DM Sans,sans-serif;max-width:560px;margin:0 auto;background:#fff">
+            <div style="background:#001858;padding:24px 32px">
+              <div style="font-size:16px;font-weight:700;color:#fff;letter-spacing:.05em">THE GOOD WEB</div>
+              <div style="font-size:9px;color:#79BEFF;letter-spacing:.12em;margin-top:2px">· THE GOOD AUDIENCE</div>
+            </div>
+            <div style="padding:32px">
+              <div style="font-size:13px;color:#79BEFF;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Brief modifié</div>
+              <div style="font-size:22px;font-weight:500;color:#001858;margin-bottom:16px">${brief.campagne||'Sans titre'}</div>
+              <div style="font-size:14px;color:#4b5563;line-height:1.7;margin-bottom:24px">${bodyText}</div>
+              <a href="https://brief.thegoodweb.eu" style="display:inline-block;background:#001858;color:#fff;font-size:13px;font-weight:500;padding:12px 24px;border-radius:8px;text-decoration:none">Voir le brief</a>
+            </div>
+            <div style="padding:16px 32px;border-top:1px solid #f3f4f6;font-size:11px;color:#9ca3af;text-align:center">
+              The Good Web · brief.thegoodweb.eu
+            </div>
+          </div>`
+      });
+    }
+  }
+
   if (type === 'status_change') {
     const statusLabels = { traitement: 'En traitement', attente: 'En attente de validation', gagne: 'Gagné', perdu: 'Perdu' };
     const label = statusLabels[brief.statut] || brief.statut;
