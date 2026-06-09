@@ -36,6 +36,45 @@ html,body{height:100%;font-family:var(--font);background:var(--gray-50);color:va
 .nav-logout{font-size:12px;color:rgba(255,255,255,.4);cursor:pointer;border:none;background:none;font-family:var(--font);padding:4px 8px;border-radius:6px;transition:all .15s}
 .nav-logout:hover{color:#fff;background:rgba(255,255,255,.08)}
 
+/* MOBILE RESPONSIVE */
+@media (max-width: 640px) {
+  .topbar{padding:0 16px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding-top:10px;padding-bottom:10px}
+  .logo{order:1}
+  .topbar-nav{order:2;width:100%;justify-content:flex-start;flex-wrap:wrap;gap:4px;padding-bottom:4px}
+  .nav-user{display:none}
+  .nav-logout{font-size:11px;padding:3px 8px}
+  .nav-btn{font-size:11.5px;padding:5px 10px}
+  .nav-btn.cta{font-size:11.5px;padding:5px 10px}
+  .main{padding:20px 16px}
+  .main.wide{max-width:100%}
+  .grid2{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat{padding:12px 8px}
+  .stat-n{font-size:22px}
+  .stat-l{font-size:10px}
+  .detail-grid{grid-template-columns:1fr}
+  .detail-item[style*="span 2"]{grid-column:span 1}
+  .auth-card{padding:28px 20px}
+  .step-header{flex-direction:column;align-items:flex-start;gap:10px}
+  .progress{align-self:flex-start}
+  .btn-row{flex-direction:column-reverse;gap:10px}
+  .btn-row .btn-back,.btn-row .btn-next{width:100%;text-align:center;justify-content:center}
+  .filter-bar{gap:5px}
+  .filter-btn{font-size:11px;padding:4px 10px}
+  .brief-row{flex-wrap:wrap;gap:8px}
+  .brief-row:hover{margin:0;padding:11px 0}
+  .page-title{font-size:18px}
+  .com-card{padding:10px 12px}
+  .chips{gap:5px}
+  .chip{font-size:12px;padding:5px 10px}
+  .toggle-row .tog{padding:8px 6px;font-size:12.5px}
+  .confirm-wrap{margin:20px auto}
+  .confirm-card{padding:28px 20px}
+  .url-add{flex-direction:column}
+  .url-add button{padding:9px;border-radius:9px}
+  .topbar-nav .nav-user{display:none}
+}
+
 /* MAIN */
 .main{flex:1;padding:32px 24px;max-width:680px;margin:0 auto;width:100%}
 .main.wide{max-width:900px}
