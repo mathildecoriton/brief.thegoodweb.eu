@@ -800,7 +800,7 @@ async function renderAgency() {
               <select class="status-select ${st.badge}" onchange="updateStatutInline('${b.id}',this.value,this)" onclick="event.stopPropagation()">
                 ${STATUTS.map(s=>`<option value="${s.id}" ${b.statut===s.id?'selected':''}>${s.label}</option>`).join('')}
               </select>
-              <button onclick="event.stopPropagation();showArchiveMessage()" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:var(--gray-50);color:var(--gray-300);cursor:not-allowed;flex-shrink:0" title="Archivage réservé à l'équipe The Good Web">🗑️</button>
+              <button onclick="event.stopPropagation();toggleArchive('${b.id}',!!${b.archived})" style="padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--gray-200);background:${b.archived?'var(--amber-light)':'var(--gray-50)'};color:${b.archived?'var(--amber)':'var(--gray-400)'};cursor:pointer;flex-shrink:0" title="${b.archived?'Restaurer':'Archiver'}">🗑️</button>
             </div>
           </div>`;
         }).join('')}
