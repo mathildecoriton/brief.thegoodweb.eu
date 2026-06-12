@@ -87,6 +87,42 @@ export default async function handler(req, res) {
     leslie: { name: 'Leslie Rogé', email: 'leslie@thegoodweb.eu', phone: '06 83 73 68 62' }
   };
 
+  if (type === 'welcome') {
+    if (clientEmail) {
+      emails.push({
+        from: 'The Good Web <noreply@thegoodweb.eu>',
+        to: clientEmail,
+        subject: 'Bienvenue sur brief.thegoodweb.eu',
+        html: `
+          <div style="font-family:DM Sans,sans-serif;max-width:560px;margin:0 auto;background:#fff">
+            <div style="background:#001858;padding:24px 32px">
+              <div style="font-size:16px;font-weight:700;color:#fff;letter-spacing:.05em">THE GOOD WEB</div>
+              <div style="font-size:9px;color:#79BEFF;letter-spacing:.12em;margin-top:2px">· THE GOOD AUDIENCE</div>
+            </div>
+            <div style="padding:32px">
+              <div style="font-size:22px;font-weight:500;color:#001858;margin-bottom:8px">Bienvenue !</div>
+              <div style="font-size:14px;color:#4b5563;line-height:1.7;margin-bottom:24px">
+                Votre compte est créé. Vous pouvez dès maintenant déposer vos demandes de campagnes directement en ligne, en quelques minutes.
+              </div>
+              <div style="background:#E8F4FF;border-radius:10px;padding:20px;margin-bottom:24px">
+                <div style="font-size:12px;color:#79BEFF;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Comment ça marche ?</div>
+                <div style="font-size:13px;color:#4b5563;line-height:1.8">
+                  <div style="margin-bottom:6px">→ Connectez-vous à votre espace</div>
+                  <div style="margin-bottom:6px">→ Déposez un brief en 7 étapes guidées</div>
+                  <div style="margin-bottom:6px">→ Votre commercial The Good Web est notifié instantanément</div>
+                  <div>→ Suivez l'avancement de vos campagnes en temps réel</div>
+                </div>
+              </div>
+              <a href="https://brief.thegoodweb.eu" style="display:inline-block;background:#001858;color:#fff;font-size:13px;font-weight:500;padding:12px 24px;border-radius:8px;text-decoration:none">Accéder à mon espace</a>
+            </div>
+            <div style="padding:16px 32px;border-top:1px solid #f3f4f6;font-size:11px;color:#9ca3af;text-align:center">
+              The Good Web · brief.thegoodweb.eu
+            </div>
+          </div>`
+      });
+    }
+  }
+
   if (type === 'plan_media_ready') {
     if (clientEmail) {
       const com = commerciaux ? commerciaux[brief.commercial] : null;
