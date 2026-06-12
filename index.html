@@ -266,8 +266,8 @@ const STATUTS = [
   {id:'nouveau',label:'Nouveau',badge:'badge-nouveau'},
   {id:'traitement',label:'En traitement',badge:'badge-traitement'},
   {id:'attente',label:'En attente client',badge:'badge-attente'},
-  {id:'gagne',label:'Gagné',badge:'badge-gagne'},
-  {id:'perdu',label:'Perdu',badge:'badge-perdu'},
+  {id:'gagne',label:'Campagne validée',badge:'badge-gagne'},
+  {id:'perdu',label:'Campagne non validée',badge:'badge-perdu'},
 ];
 
 const formSteps = ['Infos client','Objectif','Ciblages','Formats','URL','Contact','Infos complémentaires'];
@@ -894,7 +894,7 @@ function renderDetail() {
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
         <input id="plan-media-input" type="url" placeholder="https://www.canva.com/..." value="${b.lien_plan_media||''}"
           style="flex:1;min-width:200px;font-size:14px;border:1px solid var(--sky-mid);border-radius:9px;padding:9px 12px;background:#fff;color:var(--navy);outline:none;font-family:var(--font)">
-        <button onclick="savePlanMedia('${b.id}')" style="background:var(--navy);border:none;border-radius:9px;padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;color:#fff;font-family:var(--font);white-space:nowrap">Enregistrer</button>
+        <button onclick="savePlanMedia('${b.id}')" style="background:var(--navy);border:none;border-radius:9px;padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;color:#fff;font-family:var(--font);white-space:nowrap">Envoyer au client</button>
       </div>` : ''}
       ${b.lien_plan_media ? `<a href="${b.lien_plan_media}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--navy);font-weight:500;text-decoration:none;background:#fff;border:1px solid var(--sky);border-radius:8px;padding:8px 14px">&#8599; Ouvrir le plan média</a>` : `<div style="font-size:13px;color:var(--gray-400)">${isRegie ? 'Aucun lien renseigné pour l’instant.' : 'Plan média en cours de préparation.'}</div>`}
     </div>`;
@@ -962,13 +962,43 @@ async function savePlanMedia(id) {
   const input = document.getElementById('plan-media-input');
   if (!input) return;
   const url = input.value.trim();
+  if (!url) return;
   await sb.from('briefs').update({ lien_plan_media: url }).eq('id', id);
   if (detailBrief && detailBrief.id === id) detailBrief.lien_plan_media = url;
   const b = briefs.find(b=>b.id===id);
   if (b) b.lien_plan_media = url;
-  // Show confirmation
+
+  // Send email to client
+  const brief = detailBrief || b;
+  if (brief?.email_contact) {
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'plan_media_ready',
+        brief: { ...brief, lien_plan_media: url },
+        clientEmail: brief.email_contact
+      })
+    }).catch(() => {});
+  }
+
+  // Show confirmation toast
+  let toast = document.getElementById('archive-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'archive-toast';
+    toast.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:13px;padding:12px 20px;border-radius:10px;z-index:999;max-width:340px;text-align:center;line-height:1.5;transition:opacity .3s';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = 'Plan média envoyé au client par email ✓';
+  toast.style.opacity = '1';
+  toast.style.display = 'block';
+  clearTimeout(window._archiveToastTimer);
+  window._archiveToastTimer = setTimeout(() => { toast.style.opacity='0'; setTimeout(()=>{toast.style.display='none';},300); }, 3000);
+
   input.style.borderColor = 'var(--green)';
   setTimeout(() => { input.style.borderColor = 'var(--sky-mid)'; }, 2000);
+  renderMain();
 }
 
 async function updateStatutInline(id, newStatut, selectEl) {
