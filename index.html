@@ -394,9 +394,17 @@ async function doSignup() {
   const pwd = $('auth-pwd')?.value;
   const company = $('auth-company')?.value;
   if (!email || !pwd || !company) return showAuthError('Veuillez remplir tous les champs.');
-  const { error } = await sb.auth.signUp({ email, password: pwd, options: { data: { company } } });
+  const { error, data: signupData } = await sb.auth.signUp({ email, password: pwd, options: { data: { company } } });
   if (error) showAuthError(error.message);
-  else showAuthError('Compte créé ! Vérifiez votre email pour confirmer.', 'green');
+  else {
+    // Send welcome email
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'welcome', clientEmail: email, brief: { compte: company, campagne: '' } })
+    }).catch(() => {});
+    showAuthError('Compte créé ! Vous pouvez maintenant vous connecter.', 'green');
+  }
 }
 
 async function doGoogle() {
@@ -481,7 +489,10 @@ function renderForm() {
         <div class="field"><label>Budget</label><input id="f-budget" placeholder="Ex : 5 000 €" value="${fd.budget||''}"></div>
         <div class="field"><label>Nom du contact <span style="font-size:11px;color:var(--gray-400)">(optionnel)</span></label><input id="f-contact-name" placeholder="Prénom Nom" value="${fd.contactName||''}"></div>
       </div>
-      <div class="field" style="margin-top:4px"><label>Email de contact <span style="color:var(--orange)">*</span></label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||''}"></div>
+      <div class="grid2" style="margin-top:4px">
+        <div class="field"><label>Email de contact <span style="color:var(--orange)">*</span></label><input id="f-email" type="email" placeholder="vous@entreprise.com" value="${fd.email||''}"></div>
+        <div class="field"><label>Site web <span style="font-size:11px;color:var(--gray-400)">(optionnel)</span></label><input id="f-website" type="url" placeholder="https://www.votresite.com" value="${fd.website||''}"></div>
+      </div>
     </div>`;
 
   if (formStep === 1) {
@@ -557,7 +568,12 @@ function renderForm() {
     <div class="card-label">Informations complémentaires</div>
     <div class="field">
       <label>Informations supplémentaires <span style="font-size:11px;color:var(--gray-400)">(optionnel)</span></label>
-      <textarea id="f-infos" placeholder="Tout autre élément utile pour la campagne : contexte, contraintes, remarques particulières…" style="min-height:140px">${fd.infos||''}</textarea>
+      <textarea id="f-infos" placeholder="Tout autre élément utile pour la campagne : contexte, contraintes, remarques particulières…" style="min-height:120px">${fd.infos||''}</textarea>
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label>Pièce jointe <span style="font-size:11px;color:var(--gray-400)">(charte, brief PDF, visuels… max 5Mo)</span></label>
+      <input type="file" id="f-attachment" accept=".pdf,.jpg,.jpeg,.png,.gif,.zip,.doc,.docx,.ppt,.pptx" style="font-size:13px;padding:8px 0" onchange="handleFileSelect(this)">
+      <div id="f-attachment-info" style="font-size:12px;color:var(--sky);margin-top:4px">${fd.attachmentName ? '📎 ' + fd.attachmentName : ''}</div>
     </div>
   </div>`;
 
@@ -610,6 +626,20 @@ function showFormError(msg) {
 async function submitBrief() {
   const btn = document.querySelector('.btn-next');
   if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+  // Upload attachment if any
+  let attachmentUrl = '';
+  if (fd.attachmentFile) {
+    const fileExt = fd.attachmentFile.name.split('.').pop();
+    const fileName = `${Date.now()}-${session.user.id}.${fileExt}`;
+    const { data: uploadData, error: uploadError } = await sb.storage
+      .from('attachments')
+      .upload(fileName, fd.attachmentFile);
+    if (!uploadError && uploadData) {
+      const { data: urlData } = sb.storage.from('attachments').getPublicUrl(fileName);
+      attachmentUrl = urlData?.publicUrl || '';
+    }
+  }
+
   const { error } = await sb.from('briefs').insert([{
     user_id: session.user.id,
     compte: fd.compte,
@@ -619,6 +649,7 @@ async function submitBrief() {
     budget: fd.budget,
     email_contact: fd.email,
     contact_name: fd.contactName || '',
+    website: fd.website || '',
     objectif: fd.obj,
     kpis: fd.kpis,
     geo: fd.geo,
@@ -632,6 +663,8 @@ async function submitBrief() {
     urls_secondaires: fd.urls ? fd.urls.join(', ') : '',
     commercial: fd.commercial,
     infos_complementaires: fd.infos || '',
+    attachment_url: attachmentUrl,
+    attachment_name: fd.attachmentName || '',
     statut: 'nouveau',
     lien_plan_media: '',
     notes_internes: '',
@@ -741,7 +774,12 @@ async function renderAgency() {
         <button onclick="agArchiveFilter='archived';renderMain()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid ${agArchiveFilter==='archived'?'var(--amber)':'var(--gray-200)'};background:${agArchiveFilter==='archived'?'var(--amber-light)':'#fff'};color:${agArchiveFilter==='archived'?'var(--amber)':'var(--gray-600)'};cursor:pointer;font-family:var(--font);font-weight:${agArchiveFilter==='archived'?'500':'400'}">🗑️ Archives (${briefs.filter(b=>b.archived).length})</button>
       </div>
     </div>
-    <div class="page-sub">Tous les briefs clients</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:8px">
+      <div class="page-sub" style="margin-bottom:0">Tous les briefs clients</div>
+      <button onclick="exportCSV()" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--gray-200);border-radius:9px;background:#fff;font-size:12.5px;color:var(--gray-600);cursor:pointer;font-family:var(--font)">
+        <i class="ti ti-download" aria-hidden="true" style="font-size:14px"></i> Exporter CSV
+      </button>
+    </div>
     <div class="stat-grid">
       <div class="stat"><div class="stat-n">${briefs.length}</div><div class="stat-l">Total</div></div>
       <div class="stat"><div class="stat-n" style="color:var(--navy)">${briefs.filter(b=>b.statut==='nouveau').length}</div><div class="stat-l">Nouveaux</div></div>
@@ -855,7 +893,7 @@ function renderDetail() {
         <div class="detail-item"><div class="detail-label">Objectif</div><div class="detail-value ${getEditClass(b,'objectif')}">${b.objectif||'—'}${getEditBadge(b,'objectif')}</div></div>
         <div class="detail-item"><div class="detail-label">Période</div><div class="detail-value ${getEditClass(b,'debut')}">${(b.debut && b.fin) ? b.debut + ' → ' + b.fin : 'Non renseignée'}${getEditBadge(b,'debut')}</div></div>
         <div class="detail-item"><div class="detail-label">Budget</div><div class="detail-value ${getEditClass(b,'budget')}">${b.budget||'—'}${getEditBadge(b,'budget')}</div></div>
-        <div class="detail-item"><div class="detail-label">Contact</div><div class="detail-value">${b.contact_name ? b.contact_name + '<br>' : ''}${b.email_contact||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Contact</div><div class="detail-value">${b.contact_name ? b.contact_name + '<br>' : ''}${b.email_contact||'—'}${b.website ? '<br><a href="'+b.website+'" target="_blank" style="color:var(--sky);font-size:12px">'+b.website+'</a>' : ''}</div></div>
         <div class="detail-item"><div class="detail-label">Commercial</div><div class="detail-value">${com?.name||'—'}</div></div>
       </div>
     </div>
@@ -1273,6 +1311,47 @@ async function openDetail(id) {
   if (detailBrief) await loadBriefEdits(id);
   view = 'detail';
   renderMain();
+}
+
+// ─── FILE UPLOAD ───
+function handleFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Le fichier dépasse 5Mo. Veuillez choisir un fichier plus léger.');
+    input.value = '';
+    return;
+  }
+  fd.attachmentName = file.name;
+  fd.attachmentFile = file;
+  const info = document.getElementById('f-attachment-info');
+  if (info) info.textContent = '📎 ' + file.name;
+}
+
+// ─── CSV EXPORT ───
+function exportCSV() {
+  const headers = ['Compte','Campagne','Objectif','Budget','Début','Fin','Géo','Socio','Signaux financiers','Moments de vie','Intentions','Formats','Créas','URL','Commercial','Statut','Date création'];
+  const rows = briefs.map(b => {
+    const com = commerciaux.find(c=>c.id===b.commercial);
+    return [
+      b.compte||'', b.campagne||'', b.objectif||'', b.budget||'',
+      b.debut||'', b.fin||'', b.geo||'', b.socio||'',
+      b.signaux_financiers||'', b.moments_vie||'', b.intentions||'',
+      b.formats||'', b.creas||'', b.url_principale||'',
+      com?.name||'', b.statut||'',
+      b.created_at ? new Date(b.created_at).toLocaleDateString('fr-FR') : ''
+    ].map(v => '"' + String(v).replace(/"/g, '""') + '"');
+  });
+  const csv = [headers.map(h=>'"'+h+'"').join(','), ...rows.map(r=>r.join(','))].join('\n');
+  const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'briefs-thegoodweb-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 function setAuthMode(m){authMode=m;renderAuth();}
