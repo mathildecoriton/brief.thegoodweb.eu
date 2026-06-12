@@ -81,6 +81,12 @@ export default async function handler(req, res) {
     }
   }
 
+  const commerciauxDetails = {
+    jerome: { name: 'Jérôme Fages', email: 'jerome@thegoodweb.eu', phone: '06 18 74 66 75' },
+    mathilde: { name: 'Mathilde Coriton', email: 'mathilde@thegoodweb.eu', phone: '06 48 61 92 92' },
+    leslie: { name: 'Leslie Rogé', email: 'leslie@thegoodweb.eu', phone: '06 83 73 68 62' }
+  };
+
   if (type === 'plan_media_ready') {
     if (clientEmail) {
       const com = commerciaux ? commerciaux[brief.commercial] : null;
@@ -105,9 +111,15 @@ export default async function handler(req, res) {
                   ↗ Ouvrir le plan média
                 </a>
               </div>
-              <div style="background:#E8F4FF;border-radius:10px;padding:16px 20px;font-size:13px;color:#4b5563;line-height:1.6">
-                Des questions sur ce plan média ? Contactez directement votre chargé(e) de clientèle The Good Web.
-              </div>
+              ${(() => {
+                const com = commerciauxDetails[brief.commercial] || {};
+                return `<div style="background:#E8F4FF;border-radius:10px;padding:16px 20px;font-size:13px;color:#4b5563;line-height:1.6">
+                  Des questions sur ce plan média ? Contactez directement votre chargé(e) de clientèle :<br><br>
+                  <strong style="color:#001858">${com.name || 'votre contact The Good Web'}</strong><br>
+                  ${com.email ? `<a href="mailto:${com.email}" style="color:#1D6FA8;text-decoration:none">${com.email}</a><br>` : ''}
+                  ${com.phone ? `<span>${com.phone}</span>` : ''}
+                </div>`;
+              })()}
             </div>
             <div style="padding:16px 32px;border-top:1px solid #f3f4f6;font-size:11px;color:#9ca3af;text-align:center">
               The Good Web · brief.thegoodweb.eu
